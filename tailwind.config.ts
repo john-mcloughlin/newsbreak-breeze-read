@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,16 +53,39 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+				// Custom colors for news.break
+				nbBlue: {
+					50: '#E3F2FD',
+					100: '#BBDEFB',
+					200: '#90CAF9',
+					300: '#64B5F6',
+					400: '#42A5F5',
+					500: '#2196F3',
+					600: '#1E88E5',
+					700: '#1976D2',
+					800: '#1565C0',
+					900: '#0D47A1',
+				},
+				nbGreen: {
+					50: '#E8F5E9',
+					100: '#C8E6C9',
+					200: '#A5D6A7',
+					300: '#81C784',
+					400: '#66BB6A',
+					500: '#4CAF50',
+					600: '#43A047',
+					700: '#388E3C',
+					800: '#2E7D32',
+					900: '#1B5E20',
+				},
+				nbBackground: '#F8FAFC',
+				nbSurface: '#FFFFFF',
+				nbText: '#1C2033',
+				nbTextLight: '#626880',
+				nbBorder: '#E2E8F0',
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -69,26 +93,28 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
-				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+				"accordion-down": {
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
-				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+				"accordion-up": {
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
+				},
+				"fade-in": {
+					from: { opacity: '0' },
+					to: { opacity: '1' }
+				},
+				"slide-up": {
+					from: { transform: 'translateY(10px)', opacity: '0' },
+					to: { transform: 'translateY(0)', opacity: '1' }
 				}
 			},
 			animation: {
-				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				"accordion-down": "accordion-down 0.2s ease-out",
+				"accordion-up": "accordion-up 0.2s ease-out",
+				"fade-in": "fade-in 0.3s ease-out",
+				"slide-up": "slide-up 0.3s ease-out"
 			}
 		}
 	},
