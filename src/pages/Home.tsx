@@ -10,9 +10,12 @@ const Home = () => {
   const { articles, loading, error, fetchArticles, deleteArticle } = useArticles();
   const navigate = useNavigate();
   
+  // Fix: Remove fetchArticles from the dependency array to avoid infinite loop
   useEffect(() => {
+    // Call fetchArticles only once when component mounts
     fetchArticles();
-  }, [fetchArticles]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   const handleDeleteArticle = async (id: string) => {
     await deleteArticle(id);
