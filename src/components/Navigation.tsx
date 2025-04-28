@@ -39,7 +39,7 @@ const Navigation = () => {
               size="sm"
               onClick={() => navigate("/summary")}
             >
-              Summarize
+              The Break Room
             </Button>
           </nav>
           
@@ -54,7 +54,7 @@ const Navigation = () => {
                 My Backlog
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/summary")}>
-                Summarize Articles
+                The Break Room
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer text-red-500" onClick={logout}>
@@ -80,7 +80,7 @@ const Navigation = () => {
             className={`flex-1 py-4 rounded-none ${location.pathname === "/summary" ? "border-t-2 border-nbBlue-500" : ""}`}
             onClick={() => navigate("/summary")}
           >
-            Summarize
+            The Break Room
           </Button>
         </div>
       </div>

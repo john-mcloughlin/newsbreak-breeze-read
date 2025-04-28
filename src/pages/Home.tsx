@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useArticles, Article } from "@/contexts/ArticlesContext";
 import ArticleCard from "@/components/ArticleCard";
@@ -83,7 +82,7 @@ const Home = () => {
         
         {articles.length > 0 && (
           <Button onClick={() => navigate("/summary")} className="mt-4 md:mt-0">
-            Summarize Articles
+            Go to the Break Room
           </Button>
         )}
       </div>
