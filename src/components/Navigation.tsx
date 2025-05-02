@@ -32,7 +32,7 @@ const Navigation = () => {
               size="sm"
               onClick={() => navigate("/")}
             >
-              Backlog
+              Your Library
             </Button>
             <Button
               variant={location.pathname === "/summary" ? "default" : "ghost"}
@@ -51,7 +51,7 @@ const Navigation = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/")}>
-                My Backlog
+                Your Library
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/summary")}>
                 The Break Room
@@ -73,7 +73,7 @@ const Navigation = () => {
             className={`flex-1 py-4 rounded-none ${location.pathname === "/" ? "border-t-2 border-nbBlue-500" : ""}`}
             onClick={() => navigate("/")}
           >
-            Backlog
+            Your Library
           </Button>
           <Button
             variant="ghost"

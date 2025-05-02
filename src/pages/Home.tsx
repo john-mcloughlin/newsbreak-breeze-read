@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useArticles, Article } from "@/contexts/ArticlesContext";
 import ArticleCard from "@/components/ArticleCard";
@@ -47,9 +48,9 @@ const Home = () => {
       return (
         <div className="py-16 text-center">
           <BookOpen size={48} className="mx-auto mb-4 text-nbTextLight opacity-50" />
-          <h3 className="text-xl font-medium mb-2">Your backlog is empty</h3>
+          <h3 className="text-xl font-medium mb-2">Your library is empty</h3>
           <p className="text-nbTextLight mb-6 max-w-md mx-auto">
-            Save articles using the browser extension to build your backlog.
+            Save articles using the browser extension to build your library.
           </p>
         </div>
       );
@@ -72,11 +73,11 @@ const Home = () => {
     <div className="nb-container pt-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-nbText">Your Backlog</h1>
+          <h1 className="text-2xl font-bold text-nbText">Your Library</h1>
           <p className="text-nbTextLight">
             {articles.length > 0
               ? `${articles.length} saved article${articles.length !== 1 ? "s" : ""}`
-              : "Start saving articles to your backlog"}
+              : "Start saving articles to your library"}
           </p>
         </div>
         

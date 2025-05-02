@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useArticles } from "@/contexts/ArticlesContext";
 import TimeSelector from "@/components/TimeSelector";
@@ -23,9 +22,9 @@ const Summary = () => {
           <BookOpen size={48} className="mx-auto mb-4 text-nbTextLight opacity-50" />
           <h2 className="text-xl font-medium mb-2">No articles to summarize</h2>
           <p className="text-nbTextLight mb-6">
-            You need to save some articles to your backlog before you can generate summaries.
+            You need to save some articles to your library before you can generate summaries.
           </p>
-          <Button onClick={() => navigate("/")}>Go to backlog</Button>
+          <Button onClick={() => navigate("/")}>Go to library</Button>
         </div>
       </div>
     );
@@ -71,7 +70,7 @@ const Summary = () => {
             <div className="h-48 flex items-center justify-center text-center">
               <div className="text-nbTextLight">
                 <p className="mb-1">Select your available time and format</p>
-                <p className="text-sm">We'll generate a summary of your backlog articles</p>
+                <p className="text-sm">We'll generate a summary of your library articles</p>
               </div>
             </div>
           )}
