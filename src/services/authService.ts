@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import {
   createUserWithEmailAndPassword,
@@ -12,6 +11,7 @@ import {
   setDoc,
   updateDoc,
   serverTimestamp,
+  deleteDoc,
 } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
 import { User } from "@/types/auth";
@@ -94,19 +94,40 @@ export const updateUserUsername = async (userId: string, newUsername: string): P
   
   try {
     // Check if the new username is already taken
-    const usernameRef = doc(firestore, "usernames", newUsername);
-    const usernameSnap = await getDoc(usernameRef);
+    const newUsernameRef = doc(firestore, "usernames", newUsername);
+    const newUsernameSnap = await getDoc(newUsernameRef);
     
-    if (usernameSnap.exists()) {
+    if (newUsernameSnap.exists()) {
       throw new Error("Username already taken");
     }
     
-    // Update the user document first (allowed because we're the owner)
+    // Get the current user data to find the old username
     const userRef = doc(firestore, "users", userId);
-    await updateDoc(userRef, { username: newUsername });
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) {
+      throw new Error("User document doesn't exist");
+    }
+    
+    const userData = userSnap.data();
+    const oldUsername = userData?.username;
+    
+    // Update the user document with setDoc and merge option instead of updateDoc
+    await setDoc(userRef, { 
+      username: newUsername 
+    }, { merge: true });
+    
+    // Delete the old username document if it exists
+    if (oldUsername) {
+      const oldUsernameRef = doc(firestore, "usernames", oldUsername);
+      const oldUsernameSnap = await getDoc(oldUsernameRef);
+      if (oldUsernameSnap.exists()) {
+        await deleteDoc(oldUsernameRef);
+      }
+    }
     
     // Create new username document and point it to this user
-    await setDoc(usernameRef, { uid: userId });
+    await setDoc(newUsernameRef, { uid: userId });
     
     // Update Firebase Auth display name
     await updateProfile(auth.currentUser, { displayName: newUsername });
