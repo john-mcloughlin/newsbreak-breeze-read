@@ -158,7 +158,7 @@ const Account = () => {
                 disabled
                 className="bg-gray-100"
               />
-              <p className="text-xs text-muted-foreground">Email cannot be changed directly. Please contact support.</p>
+              <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
             </div>
           </CardContent>
           <CardFooter>
