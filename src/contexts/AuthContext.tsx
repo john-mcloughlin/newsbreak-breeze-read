@@ -14,7 +14,7 @@ import {
   setDoc,
   serverTimestamp
 } from "firebase/firestore";
-import { auth, firestore } from "src/lib/firebase.ts";
+import { auth, firestore } from "@/lib/firebase";
 
 interface User {
   id: string;

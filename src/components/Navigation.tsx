@@ -46,7 +46,7 @@ const Navigation = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                {user?.name || user?.email}
+                {user?.username || user?.email}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
