@@ -1,14 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { User as FirebaseUser, updateEmail, updateProfile } from "firebase/auth";
+import { User as FirebaseUser, updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
+import { AlertCircle, Check } from "lucide-react";
 
 const Account = () => {
   const { user } = useAuth();
@@ -19,6 +20,49 @@ const Account = () => {
   });
   
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  
+  // Reset form when user changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        username: user.username || "",
+        email: user.email || ""
+      });
+    }
+  }, [user]);
+  
+  // Check username availability when username changes
+  useEffect(() => {
+    // Skip check if username hasn't changed or is too short
+    if (!user || formData.username === user.username || formData.username.length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+    
+    const checkUsernameAvailability = async () => {
+      setCheckingUsername(true);
+      try {
+        const usernameRef = doc(firestore, "usernames", formData.username);
+        const usernameSnap = await getDoc(usernameRef);
+        
+        // Username is available if document doesn't exist or belongs to current user
+        const isAvailable = !usernameSnap.exists() || 
+                           (usernameSnap.exists() && usernameSnap.data()?.uid === user.id);
+                           
+        setUsernameAvailable(isAvailable);
+      } catch (err) {
+        console.error("Error checking username:", err);
+      } finally {
+        setCheckingUsername(false);
+      }
+    };
+    
+    // Debounce check to avoid too many requests
+    const timeoutId = setTimeout(checkUsernameAvailability, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.username, user]);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,21 +74,17 @@ const Account = () => {
     
     if (!user) return;
     
+    // Check if username is available when it's changed
+    if (formData.username !== user.username && !usernameAvailable) {
+      toast.error("Username is already taken");
+      return;
+    }
+    
     try {
       setIsLoading(true);
       
       // Update username if changed
       if (user.username !== formData.username && formData.username.trim()) {
-        // Check if username is available
-        const usernameRef = doc(firestore, "usernames", formData.username);
-        const usernameSnap = await getDoc(usernameRef);
-        
-        if (usernameSnap.exists() && usernameSnap.data().uid !== user.id) {
-          toast.error("Username already taken");
-          setIsLoading(false);
-          return;
-        }
-        
         // Remove old username reference
         if (user.username) {
           const oldUsernameRef = doc(firestore, "usernames", user.username);
@@ -52,6 +92,7 @@ const Account = () => {
         }
         
         // Set new username reference
+        const usernameRef = doc(firestore, "usernames", formData.username);
         await updateDoc(usernameRef, {
           uid: user.id
         });
@@ -72,7 +113,9 @@ const Account = () => {
       
       // Update email if changed
       if (user.email !== formData.email && formData.email) {
-        await updateEmail(auth.currentUser as FirebaseUser, formData.email);
+        await updateProfile(auth.currentUser as FirebaseUser, {
+          email: formData.email
+        });
         toast.success("Email updated successfully");
       }
       
@@ -103,14 +146,36 @@ const Account = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="Username"
+                  required
+                  minLength={3}
+                  className={formData.username !== user.username ? 
+                    (usernameAvailable ? "pr-10 border-green-500" : "pr-10 border-red-500") : ""}
+                />
+                {formData.username !== user.username && formData.username.length >= 3 && !checkingUsername && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    {usernameAvailable ? (
+                      <Check className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                )}
+              </div>
+              {formData.username !== user.username && formData.username.length >= 3 && !checkingUsername && (
+                <div className="text-xs">
+                  {usernameAvailable ? 
+                    <span className="text-green-600">Username available!</span> : 
+                    <span className="text-red-600">Username already taken</span>
+                  }
+                </div>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -127,7 +192,10 @@ const Account = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading || (formData.username !== user.username && !usernameAvailable)}
+            >
               {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </CardFooter>
