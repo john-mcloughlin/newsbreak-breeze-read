@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { User as FirebaseUser, updateEmail, updatePassword, updateProfile } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { User as FirebaseUser, updateEmail, updateProfile } from "firebase/auth";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
 
 const Account = () => {
@@ -15,9 +15,7 @@ const Account = () => {
   
   const [formData, setFormData] = useState({
     username: user?.username || "",
-    email: user?.email || "",
-    password: "",
-    confirmPassword: ""
+    email: user?.email || ""
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +36,27 @@ const Account = () => {
       // Update username if changed
       if (user.username !== formData.username && formData.username.trim()) {
         // Check if username is available
+        const usernameRef = doc(firestore, "usernames", formData.username);
+        const usernameSnap = await getDoc(usernameRef);
+        
+        if (usernameSnap.exists() && usernameSnap.data().uid !== user.id) {
+          toast.error("Username already taken");
+          setIsLoading(false);
+          return;
+        }
+        
+        // Remove old username reference
+        if (user.username) {
+          const oldUsernameRef = doc(firestore, "usernames", user.username);
+          await updateDoc(oldUsernameRef, { uid: null });
+        }
+        
+        // Set new username reference
+        await updateDoc(usernameRef, {
+          uid: user.id
+        });
+        
+        // Update user document
         const userRef = doc(firestore, "users", user.id);
         await updateDoc(userRef, {
           username: formData.username
@@ -55,23 +74,6 @@ const Account = () => {
       if (user.email !== formData.email && formData.email) {
         await updateEmail(auth.currentUser as FirebaseUser, formData.email);
         toast.success("Email updated successfully");
-      }
-      
-      // Update password if provided
-      if (formData.password) {
-        if (formData.password !== formData.confirmPassword) {
-          toast.error("Passwords do not match");
-          return;
-        }
-        
-        if (formData.password.length < 6) {
-          toast.error("Password must be at least 6 characters");
-          return;
-        }
-        
-        await updatePassword(auth.currentUser as FirebaseUser, formData.password);
-        setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
-        toast.success("Password updated successfully");
       }
       
     } catch (error) {
@@ -94,7 +96,7 @@ const Account = () => {
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
           <CardDescription>
-            Update your account details and password
+            Update your account details
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleUpdateProfile}>
@@ -107,6 +109,7 @@ const Account = () => {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Username"
+                required
               />
             </div>
             
@@ -119,30 +122,7 @@ const Account = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Leave blank to keep current password"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm new password"
+                required
               />
             </div>
           </CardContent>

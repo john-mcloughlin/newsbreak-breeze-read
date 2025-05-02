@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const Register = () => {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -25,8 +25,13 @@ const Register = () => {
     e.preventDefault();
     setError("");
     
+    if (!username.trim()) {
+      setError("Username is required");
+      return;
+    }
+    
     try {
-      await register(email, password, name);
+      await register(email, password, username);
       navigate("/");
     } catch (err) {
       setError("Registration failed. Please try again.");
@@ -57,18 +62,19 @@ const Register = () => {
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="username">Username <span className="text-red-500">*</span></Label>
                 <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
-                  placeholder="Your name"
+                  placeholder="Choose a unique username"
                 />
+                <p className="text-xs text-nbTextLight">This will be your unique identifier on news.break</p>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
                 <Input
                   id="email"
                   type="email"
@@ -80,7 +86,7 @@ const Register = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Password <span className="text-red-500">*</span></Label>
                 <Input
                   id="password"
                   type="password"
