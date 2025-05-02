@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Summary from "./pages/Summary";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/" element={<Layout />}>
                 <Route index element={<ProtectedRoute><Home /></ProtectedRoute>} />
                 <Route path="summary" element={<ProtectedRoute><Summary /></ProtectedRoute>} />
+                <Route path="account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

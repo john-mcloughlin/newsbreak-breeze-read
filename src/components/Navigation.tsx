@@ -32,7 +32,7 @@ const Navigation = () => {
               size="sm"
               onClick={() => navigate("/")}
             >
-              Your Library
+              My Library
             </Button>
             <Button
               variant={location.pathname === "/summary" ? "default" : "ghost"}
@@ -40,6 +40,13 @@ const Navigation = () => {
               onClick={() => navigate("/summary")}
             >
               The Break Room
+            </Button>
+            <Button
+              variant={location.pathname === "/account" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => navigate("/account")}
+            >
+              My Account
             </Button>
           </nav>
           
@@ -51,10 +58,13 @@ const Navigation = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/")}>
-                Your Library
+                My Library
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/summary")}>
                 The Break Room
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/account")}>
+                My Account
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer text-red-500" onClick={logout}>
@@ -73,7 +83,7 @@ const Navigation = () => {
             className={`flex-1 py-4 rounded-none ${location.pathname === "/" ? "border-t-2 border-nbBlue-500" : ""}`}
             onClick={() => navigate("/")}
           >
-            Your Library
+            My Library
           </Button>
           <Button
             variant="ghost"
@@ -81,6 +91,13 @@ const Navigation = () => {
             onClick={() => navigate("/summary")}
           >
             The Break Room
+          </Button>
+          <Button
+            variant="ghost"
+            className={`flex-1 py-4 rounded-none ${location.pathname === "/account" ? "border-t-2 border-nbBlue-500" : ""}`}
+            onClick={() => navigate("/account")}
+          >
+            My Account
           </Button>
         </div>
       </div>

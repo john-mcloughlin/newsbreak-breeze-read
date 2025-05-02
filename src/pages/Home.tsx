@@ -73,7 +73,7 @@ const Home = () => {
     <div className="nb-container pt-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-nbText">Your Library</h1>
+          <h1 className="text-2xl font-bold text-nbText">My Library</h1>
           <p className="text-nbTextLight">
             {articles.length > 0
               ? `${articles.length} saved article${articles.length !== 1 ? "s" : ""}`
