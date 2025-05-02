@@ -1,96 +1,90 @@
-
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, User as FirebaseUser } from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
-import { User, AuthContextType } from "@/types/auth";
-import { loginUser, registerUser, updateUserUsername, logoutUser } from "@/services/authService";
+import { User } from "@/types/auth";
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// ---------------------------
+// LOGIN USER
+// ---------------------------
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+export const loginUser = async (email: string, password: string): Promise<User> => {
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  const firebaseUser = result.user;
+
+  // Fetch user profile from Firestore
+  const userDoc = await getDoc(doc(firestore, "users", firebaseUser.uid));
+
+  return {
+    id: firebaseUser.uid,
+    email: firebaseUser.email || "",
+    username: userDoc.exists() ? userDoc.data()?.username : undefined,
+  };
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+// ---------------------------
+// REGISTER USER
+// ---------------------------
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export const registerUser = async (email: string, password: string, username: string): Promise<User> => {
+  // Check if username exists
+  const usernameRef = doc(firestore, "usernames", username.toLowerCase());
+  const usernameSnap = await getDoc(usernameRef);
 
-  // Listen to auth state changes
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userDoc = await getDoc(doc(firestore, "users", firebaseUser.uid));
-        setUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email || "",
-          username: userDoc.exists() ? userDoc.data()?.username : undefined
-        });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
+  if (usernameSnap.exists()) {
+    throw new Error("Username already taken");
+  }
+
+  // Create new user with Firebase Auth
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  const firebaseUser = result.user;
+
+  // Claim the username
+  await setDoc(usernameRef, {
+    uid: firebaseUser.uid,
+  });
+
+  // Create user profile in Firestore
+  await setDoc(doc(firestore, "users", firebaseUser.uid), {
+    username: username,
+    email: firebaseUser.email,
+    createdAt: serverTimestamp(),
+  });
+
+  // Update Firebase Auth display name
+  await updateProfile(firebaseUser, {
+    displayName: username,
+  });
+
+  return {
+    id: firebaseUser.uid,
+    email: firebaseUser.email || "",
+    username: username,
+  };
+};
+
+// ---------------------------
+// UPDATE USER USERNAME
+// ---------------------------
+
+export const updateUserUsername = async (userId: string, username: string) => {
+  // Update Firestore user profile → SAFE (no document error)
+  await setDoc(doc(firestore, "users", userId), {
+    username
+  }, { merge: true });
+
+  // Optionally update Firebase Auth profile displayName
+  const firebaseUser = auth.currentUser;
+  if (firebaseUser?.uid === userId) {
+    await updateProfile(firebaseUser, {
+      displayName: username,
     });
+  }
+};
 
-    return () => unsubscribe();
-  }, []);
+// ---------------------------
+// LOGOUT USER
+// ---------------------------
 
-  // Login function
-  const login = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const userData = await loginUser(email, password);
-      setUser(userData);
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Register function with username logic
-  const register = async (email: string, password: string, username: string) => {
-    setLoading(true);
-    try {
-      const userData = await registerUser(email, password, username);
-      setUser(userData);
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Update username function
-  const updateUsername = async (newUsername: string) => {
-    if (!user) {
-      throw new Error("No authenticated user");
-    }
-    
-    try {
-      await updateUserUsername(user.id, newUsername);
-      setUser(prev => prev ? { ...prev, username: newUsername } : null);
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const logout = () => {
-    logoutUser();
-    setUser(null);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, loading, login, register, updateUsername, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+export const logoutUser = async () => {
+  await signOut(auth);
 };
