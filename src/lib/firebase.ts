@@ -1,6 +1,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import {} from 'firebase/firestore/lite'
 
 // Replace these with your actual Firebase config values
 const firebaseConfig = {
