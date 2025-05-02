@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
 import {
@@ -12,6 +13,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  updateDoc,
   serverTimestamp
 } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
@@ -27,6 +29,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
+  updateUsername: (username: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -141,6 +144,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  // Update username function
+  const updateUsername = async (newUsername: string) => {
+    if (!auth.currentUser || !user) {
+      throw new Error("No authenticated user");
+    }
+    
+    try {
+      const oldUsername = user.username;
+      const uid = user.id;
+      
+      // Create or update the username document
+      const usernameRef = doc(firestore, "usernames", newUsername);
+      await setDoc(usernameRef, { uid });
+      
+      // Remove the old username reference if it exists
+      if (oldUsername && oldUsername !== newUsername) {
+        const oldUsernameRef = doc(firestore, "usernames", oldUsername);
+        await setDoc(oldUsernameRef, { uid: null });
+      }
+      
+      // Update the user document
+      const userRef = doc(firestore, "users", uid);
+      await updateDoc(userRef, { username: newUsername });
+      
+      // Update Firebase Auth display name
+      await updateProfile(auth.currentUser, { displayName: newUsername });
+      
+      // Update local user state
+      setUser(prev => prev ? { ...prev, username: newUsername } : null);
+      
+      return;
+    } catch (error) {
+      console.error("Failed to update username:", error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     signOut(auth);
     setUser(null);
@@ -148,7 +188,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateUsername, logout }}>
       {children}
     </AuthContext.Provider>
   );

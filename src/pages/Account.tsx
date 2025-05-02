@@ -6,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { User as FirebaseUser, updateProfile } from "firebase/auth";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { User as FirebaseUser } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
 import { AlertCircle, Check } from "lucide-react";
 
 const Account = () => {
-  const { user } = useAuth();
+  const { user, updateUsername } = useAuth();
   
   const [formData, setFormData] = useState({
     username: user?.username || "",
@@ -85,38 +85,13 @@ const Account = () => {
       
       // Update username if changed
       if (user.username !== formData.username && formData.username.trim()) {
-        // Remove old username reference
-        if (user.username) {
-          const oldUsernameRef = doc(firestore, "usernames", user.username);
-          await updateDoc(oldUsernameRef, { uid: null });
-        }
-        
-        // Set new username reference
-        const usernameRef = doc(firestore, "usernames", formData.username);
-        await updateDoc(usernameRef, {
-          uid: user.id
-        });
-        
-        // Update user document
-        const userRef = doc(firestore, "users", user.id);
-        await updateDoc(userRef, {
-          username: formData.username
-        });
-        
-        // Update Firebase profile (only displayName - don't try to update email here)
-        await updateProfile(auth.currentUser as FirebaseUser, {
-          displayName: formData.username
-        });
-        
+        await updateUsername(formData.username);
         toast.success("Username updated successfully");
       }
       
-      // Note: We're not updating the email here to fix the build error
-      // Firebase Auth email update requires re-authentication and is more complex
-      
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Failed to update profile. You may need to re-authenticate.");
+      toast.error("Failed to update profile. Please try again later.");
     } finally {
       setIsLoading(false);
     }
