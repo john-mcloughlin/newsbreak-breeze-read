@@ -1,27 +1,33 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  User as FirebaseUser
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "firebase/firestore";
+import { auth, firestore } from "src/lib/firebase.ts";
 
 interface User {
   id: string;
   email: string;
-  name?: string;
+  username?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => Promise<void>;
+  register: (email: string, password: string, username: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,80 +48,103 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Listen for auth state changes
+  // Listen to auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const appUser: User = {
+        const userDoc = await getDoc(doc(firestore, "users", firebaseUser.uid));
+        setUser({
           id: firebaseUser.uid,
           email: firebaseUser.email || "",
-          name: firebaseUser.displayName || undefined
-        };
-        setUser(appUser);
+          username: userDoc.exists() ? userDoc.data()?.username : undefined
+        });
       } else {
         setUser(null);
       }
       setLoading(false);
     });
 
-    // Cleanup subscription
     return () => unsubscribe();
   }, []);
 
-  // Firebase login function
+  // Login function
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = result.user;
+
+      const userDoc = await getDoc(doc(firestore, "users", firebaseUser.uid));
+
+      setUser({
+        id: firebaseUser.uid,
+        email: firebaseUser.email || "",
+        username: userDoc.exists() ? userDoc.data()?.username : undefined
+      });
+
       toast.success("Successfully logged in!");
-    } catch (error: any) {
-      console.error("Login failed:", error.message);
-      toast.error(error.message || "Login failed. Please check your credentials.");
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast.error("Login failed. Please check your credentials.");
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Firebase register function
-  const register = async (email: string, password: string, name: string) => {
+  // Register function with username logic
+  const register = async (email: string, password: string, username: string) => {
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update profile to add display name
-      if (userCredential.user) {
-        await updateProfile(userCredential.user, {
-          displayName: name
-        });
-        
-        // Update local state to include the name immediately
-        setUser({
-          id: userCredential.user.uid,
-          email: userCredential.user.email || "",
-          name: name
-        });
+      // Check username availability
+      const usernameRef = doc(firestore, "usernames", username);
+      const usernameSnap = await getDoc(usernameRef);
+
+      if (usernameSnap.exists()) {
+        throw new Error("Username already taken");
       }
-      
+
+      // Create user
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+
+      // Reserve username
+      await setDoc(usernameRef, {
+        uid: uid
+      });
+
+      // Create user profile
+      await setDoc(doc(firestore, "users", uid), {
+        username: username,
+        email: userCredential.user.email,
+        createdAt: serverTimestamp(),
+      });
+
+      // Update displayName
+      await updateProfile(userCredential.user, {
+        displayName: username
+      });
+
+      setUser({
+        id: uid,
+        email: userCredential.user.email || "",
+        username: username
+      });
+
       toast.success("Successfully registered!");
-    } catch (error: any) {
-      console.error("Registration failed:", error.message);
-      toast.error(error.message || "Registration failed. Please try again.");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      toast.error((error as Error).message);
       throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  // Firebase logout function
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      toast.info("You have been logged out");
-    } catch (error: any) {
-      console.error("Logout failed:", error.message);
-      toast.error(error.message || "Logout failed");
-    }
+  const logout = () => {
+    signOut(auth);
+    setUser(null);
+    toast.info("You have been logged out");
   };
 
   return (

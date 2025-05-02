@@ -20,4 +20,5 @@ const firestore = getFirestore();
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
+export const firestore = getFirestore(app);
 export default app;
