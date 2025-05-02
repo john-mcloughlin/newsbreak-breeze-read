@@ -4,10 +4,12 @@ import Navigation from "./Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Layout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   if (!user) {
     return (
@@ -27,8 +29,10 @@ const Layout = () => {
   return (
     <div className="flex min-h-screen flex-col bg-nbBackground">
       <Navigation />
-      <main className="flex-1 pb-20">
-        <Outlet />
+      <main className="flex-1 w-full max-w-full mx-auto">
+        <div className={`${isMobile ? 'px-4' : 'px-6'}`}>
+          <Outlet />
+        </div>
       </main>
     </div>
   );

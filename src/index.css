@@ -49,7 +49,8 @@
 
 @layer components {
   .nb-container {
-    @apply max-w-3xl mx-auto px-4 sm:px-6;
+    @apply w-full mx-auto px-4 sm:px-6;
+    max-width: min(95%, 1200px);
   }
 
   .card-hover {

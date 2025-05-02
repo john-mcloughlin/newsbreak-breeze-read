@@ -103,7 +103,7 @@ const Account = () => {
           username: formData.username
         });
         
-        // Update Firebase profile
+        // Update Firebase profile (only displayName - don't try to update email here)
         await updateProfile(auth.currentUser as FirebaseUser, {
           displayName: formData.username
         });
@@ -111,13 +111,8 @@ const Account = () => {
         toast.success("Username updated successfully");
       }
       
-      // Update email if changed
-      if (user.email !== formData.email && formData.email) {
-        await updateProfile(auth.currentUser as FirebaseUser, {
-          email: formData.email
-        });
-        toast.success("Email updated successfully");
-      }
+      // Note: We're not updating the email here to fix the build error
+      // Firebase Auth email update requires re-authentication and is more complex
       
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -188,7 +183,10 @@ const Account = () => {
                 onChange={handleChange}
                 placeholder="Email"
                 required
+                disabled
+                className="bg-gray-100"
               />
+              <p className="text-xs text-muted-foreground">Email cannot be changed directly. Please contact support.</p>
             </div>
           </CardContent>
           <CardFooter>
