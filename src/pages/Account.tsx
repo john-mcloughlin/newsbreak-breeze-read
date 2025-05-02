@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, firestore } from "@/lib/firebase";
+import { firestore } from "@/lib/firebase";
 import { AlertCircle, Check } from "lucide-react";
 
 const Account = () => {
@@ -86,12 +85,11 @@ const Account = () => {
       // Update username if changed
       if (user.username !== formData.username && formData.username.trim()) {
         await updateUsername(formData.username);
-        toast.success("Username updated successfully");
       }
       
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Failed to update profile. Please try again later.");
+      // Error message will be handled by the updateUsername function
     } finally {
       setIsLoading(false);
     }

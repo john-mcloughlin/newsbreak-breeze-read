@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
 import {
@@ -14,7 +13,8 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  deleteDoc
 } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
 
@@ -154,17 +154,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const oldUsername = user.username;
       const uid = user.id;
       
-      // Create or update the username document
+      // Check if the new username is already taken (by someone else)
       const usernameRef = doc(firestore, "usernames", newUsername);
-      await setDoc(usernameRef, { uid });
+      const usernameSnap = await getDoc(usernameRef);
       
-      // Remove the old username reference if it exists
-      if (oldUsername && oldUsername !== newUsername) {
-        const oldUsernameRef = doc(firestore, "usernames", oldUsername);
-        await setDoc(oldUsernameRef, { uid: null });
+      if (usernameSnap.exists() && usernameSnap.data()?.uid !== uid) {
+        throw new Error("Username already taken");
       }
       
-      // Update the user document
+      // Create new username document
+      // According to your rules, we can only create new username documents
+      await setDoc(usernameRef, { uid });
+      
+      // Update the user document (allowed because we're the owner)
       const userRef = doc(firestore, "users", uid);
       await updateDoc(userRef, { username: newUsername });
       
@@ -174,9 +176,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Update local user state
       setUser(prev => prev ? { ...prev, username: newUsername } : null);
       
+      // Since we can't delete or update the old username document,
+      // we'll just leave it in the database with its current uid
+      // This is not ideal but works within your current security rules
+      
+      toast.success("Username updated successfully");
       return;
     } catch (error) {
       console.error("Failed to update username:", error);
+      toast.error((error as Error).message || "Failed to update username");
       throw error;
     }
   };
