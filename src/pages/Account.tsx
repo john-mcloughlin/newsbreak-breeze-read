@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { User as FirebaseUser } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { firestore } from "@/lib/firebase";
 import { AlertCircle, Check } from "lucide-react";
@@ -46,9 +46,8 @@ const Account = () => {
         const usernameRef = doc(firestore, "usernames", formData.username);
         const usernameSnap = await getDoc(usernameRef);
         
-        // Username is available if document doesn't exist or belongs to current user
-        const isAvailable = !usernameSnap.exists() || 
-                           (usernameSnap.exists() && usernameSnap.data()?.uid === user.id);
+        // Username is available if document doesn't exist
+        const isAvailable = !usernameSnap.exists();
                            
         setUsernameAvailable(isAvailable);
       } catch (err) {
@@ -89,7 +88,7 @@ const Account = () => {
       
     } catch (error) {
       console.error("Error updating profile:", error);
-      // Error message will be handled by the updateUsername function
+      // Error is already handled in the updateUsername function
     } finally {
       setIsLoading(false);
     }

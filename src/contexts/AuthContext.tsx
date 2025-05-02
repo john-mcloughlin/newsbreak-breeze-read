@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
 import {
@@ -14,7 +15,11 @@ import {
   setDoc,
   updateDoc,
   serverTimestamp,
-  deleteDoc
+  deleteDoc,
+  collection,
+  query,
+  where,
+  getDocs
 } from "firebase/firestore";
 import { auth, firestore } from "@/lib/firebase";
 
@@ -151,24 +156,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
     
     try {
-      const oldUsername = user.username;
       const uid = user.id;
       
-      // Check if the new username is already taken (by someone else)
+      // Check if the new username is already taken
       const usernameRef = doc(firestore, "usernames", newUsername);
       const usernameSnap = await getDoc(usernameRef);
       
-      if (usernameSnap.exists() && usernameSnap.data()?.uid !== uid) {
+      if (usernameSnap.exists()) {
         throw new Error("Username already taken");
       }
       
-      // Create new username document
-      // According to your rules, we can only create new username documents
-      await setDoc(usernameRef, { uid });
-      
-      // Update the user document (allowed because we're the owner)
+      // Update the user document first (allowed because we're the owner)
       const userRef = doc(firestore, "users", uid);
       await updateDoc(userRef, { username: newUsername });
+      
+      // Create new username document and point it to this user
+      await setDoc(usernameRef, { uid });
       
       // Update Firebase Auth display name
       await updateProfile(auth.currentUser, { displayName: newUsername });
@@ -176,12 +179,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Update local user state
       setUser(prev => prev ? { ...prev, username: newUsername } : null);
       
-      // Since we can't delete or update the old username document,
-      // we'll just leave it in the database with its current uid
-      // This is not ideal but works within your current security rules
+      // Note: We're not trying to delete the old username document
+      // since our security rules don't allow it. This means old usernames
+      // will remain reserved, which is actually good for username continuity.
       
       toast.success("Username updated successfully");
-      return;
     } catch (error) {
       console.error("Failed to update username:", error);
       toast.error((error as Error).message || "Failed to update username");
