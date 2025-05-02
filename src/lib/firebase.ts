@@ -1,7 +1,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import {} from 'firebase/firestore/lite'
+import { getFirestore } from 'firebase/firestore/lite'
 
 // Replace these with your actual Firebase config values
 const firebaseConfig = {
@@ -16,6 +16,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const firestore = getFirestore();
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
