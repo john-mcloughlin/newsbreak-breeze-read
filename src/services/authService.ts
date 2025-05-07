@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import {
   createUserWithEmailAndPassword,
@@ -8,7 +9,7 @@ import {
 import { auth } from "@/lib/firebase";
 import { User } from "@/types/auth";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "https://sanoma.adm.pizza";
+const API_BASE = import.meta.env.VITE_APP_API_BASE || "https://sanoma.adm.pizza";
 
 // Login function
 export const loginUser = async (
