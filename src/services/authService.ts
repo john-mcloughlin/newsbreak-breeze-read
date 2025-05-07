@@ -54,6 +54,7 @@ export const registerUser = async (
     // 2) Store displayName
     await updateProfile(userCred.user, { displayName: username });
 
+    // …
     // 3) Insert into your MySQL via PHP endpoint
     const res = await fetch(
       "https://sanoma.adm.pizza/create_user.php",
@@ -67,6 +68,17 @@ export const registerUser = async (
           last_name: lastName,
         }),
       }
+    );
+
+    console.log("create_user.php status:", res.status);
+    const text = await res.text();
+    console.log("create_user.php response:", text);
+
+    if (!res.ok) {
+      throw new Error(`Load failed: ${res.status} ${text}`);
+    }
+// …
+
     );
     if (!res.ok) {
       const txt = await res.text();
