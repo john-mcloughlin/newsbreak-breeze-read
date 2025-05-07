@@ -57,7 +57,7 @@ export const registerUser = async (
 
     // 3) Save profile in MySQL via your PHP script
     const res = await fetch(
-      "https://yourdomain.com/php/create_user.php",
+      "https://sanoma.adm.pizza/create_user.php",
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },

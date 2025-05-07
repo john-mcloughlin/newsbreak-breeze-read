@@ -86,7 +86,7 @@ const Register = () => {
 
               {/* First name */}
               <div className="space-y-2">
-                <Label htmlFor="name">First Name</Label>
+                <Label htmlFor="name">First Name <span className="text-red-500">*</span></Label>
                 <Input
                   id="name"
                   value={name}
@@ -97,7 +97,7 @@ const Register = () => {
 
               {/* Last name */}
               <div className="space-y-2">
-                <Label htmlFor="surname">Last Name</Label>
+                <Label htmlFor="surname">Last Name <span className="text-red-500">*</span></Label>
                 <Input
                   id="surname"
                   value={surname}
