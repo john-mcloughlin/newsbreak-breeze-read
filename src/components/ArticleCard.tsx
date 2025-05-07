@@ -27,11 +27,26 @@ interface ArticleCardProps {
 
 const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject }: ArticleCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const handleDelete = async () => {
     setIsDeleting(true);
     await onDelete(article.id);
     setIsDeleting(false);
+  };
+
+  const handleSave = async () => {
+    if (onAccept) {
+      setIsSaving(true);
+      await onAccept(article);
+      setIsSaving(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (onReject) {
+      await onReject(article.id);
+    }
   };
 
   const formatSavedAt = (dateString: string) => {
@@ -74,15 +89,16 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
               <Button 
                 size="sm" 
                 className="flex-1 hover:bg-nbBlue-600 transition-colors" 
-                onClick={() => onAccept && onAccept(article)}
+                onClick={handleSave}
+                disabled={isSaving}
               >
-                Save
+                {isSaving ? "Saving..." : "Save"}
               </Button>
               <Button 
                 size="sm" 
                 variant="outline" 
                 className="flex-1 hover:bg-nbBlue-50 transition-colors" 
-                onClick={() => onReject && onReject(article.id)}
+                onClick={handleReject}
               >
                 Ignore
               </Button>

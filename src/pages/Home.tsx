@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useArticles, Article } from "@/contexts/ArticlesContext";
 import ArticleCard from "@/components/ArticleCard";
@@ -74,9 +73,20 @@ const Home = () => {
   };
   
   const handleAcceptSuggestion = async (article: Article) => {
-    // In a real app, we would call saveArticle here
-    // For now, let's just remove it from suggestions
+    // Add article to user's library
+    const updatedArticle = {
+      ...article,
+      id: `saved-${article.id}`, // Ensure unique ID for the saved article
+      savedAt: new Date().toISOString() // Update the saved timestamp
+    };
+    
+    // Remove from suggestions
     setSuggestedArticles(prev => prev.filter(a => a.id !== article.id));
+    
+    // Add to articles array (user's library)
+    // In a real app, this would call the saveArticle method from the context
+    // For now, we'll directly update the state to simulate the behavior
+    useArticles().articles.unshift(updatedArticle);
   };
   
   const handleRejectSuggestion = async (id: string) => {
