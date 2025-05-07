@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
@@ -60,6 +61,7 @@ const Carousel = React.forwardRef<
       {
         ...opts,
         axis: orientation === "horizontal" ? "x" : "y",
+        dragFree: true,
       },
       plugins
     )
@@ -159,7 +161,7 @@ const CarouselContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "flex",
+          "flex touch-pan-y",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className
         )}

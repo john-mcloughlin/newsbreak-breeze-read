@@ -43,7 +43,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
   };
   
   return (
-    <Card className="w-[280px] h-[320px] flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 card-hover bg-white hover:bg-nbBackground">
+    <Card className="w-full max-w-[280px] h-[320px] flex flex-col overflow-hidden shadow-sm card-hover bg-white hover:bg-nbBackground">
       <div className="h-40 bg-nbBlue-50 overflow-hidden">
         {article.imageUrl ? (
           <img

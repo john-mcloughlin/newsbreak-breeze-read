@@ -123,7 +123,7 @@ const Home = () => {
         <CarouselContent className="-ml-4 md:-ml-6">
           {articles.map((article: Article) => (
             <CarouselItem key={article.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <div className="p-1">
+              <div className="p-3">
                 <ArticleCard
                   article={article}
                   onDelete={handleDeleteArticle}
@@ -152,7 +152,7 @@ const Home = () => {
         <CarouselContent className="-ml-4 md:-ml-6">
           {suggestedArticles.map((article: Article) => (
             <CarouselItem key={article.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <div className="p-1">
+              <div className="p-3">
                 <ArticleCard
                   article={article}
                   onDelete={handleDeleteArticle}
