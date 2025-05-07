@@ -1,19 +1,71 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useArticles, Article } from "@/contexts/ArticlesContext";
 import ArticleCard from "@/components/ArticleCard";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { BookOpen } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const Home = () => {
   const { articles, loading, error, fetchArticles, deleteArticle } = useArticles();
   const navigate = useNavigate();
+  const [suggestedArticles, setSuggestedArticles] = useState<Article[]>([]);
   
   // Fix: Remove fetchArticles from the dependency array to avoid infinite loop
   useEffect(() => {
     // Call fetchArticles only once when component mounts
     fetchArticles();
+    
+    // Mock suggested articles
+    const mockSuggestions = [
+      {
+        id: "s1",
+        url: "https://example.com/suggested1",
+        title: "The Impact of AI on Future Employment Opportunities",
+        description: "Experts predict how artificial intelligence will transform job markets over the next decade.",
+        imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+        source: "Tech Insights",
+        savedAt: new Date(Date.now() - 86400000).toISOString()
+      },
+      {
+        id: "s2",
+        url: "https://example.com/suggested2",
+        title: "Sustainable Urban Planning: Cities of Tomorrow",
+        description: "How urban planners are incorporating green technologies into future city designs.",
+        imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+        source: "Environment Today",
+        savedAt: new Date(Date.now() - 172800000).toISOString()
+      },
+      {
+        id: "s3",
+        url: "https://example.com/suggested3",
+        title: "The Psychology of Decision Making Under Pressure",
+        description: "Research reveals how stress affects our ability to make rational choices.",
+        imageUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+        source: "Psychology Weekly",
+        savedAt: new Date(Date.now() - 259200000).toISOString()
+      },
+      {
+        id: "s4",
+        url: "https://example.com/suggested4",
+        title: "Breakthroughs in Renewable Energy Storage",
+        description: "New battery technologies that could revolutionize how we store and use clean energy.",
+        imageUrl: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
+        source: "Science Daily",
+        savedAt: new Date(Date.now() - 345600000).toISOString()
+      }
+    ];
+    
+    setSuggestedArticles(mockSuggestions);
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
@@ -21,10 +73,20 @@ const Home = () => {
     await deleteArticle(id);
   };
   
+  const handleAcceptSuggestion = async (article: Article) => {
+    // In a real app, we would call saveArticle here
+    // For now, let's just remove it from suggestions
+    setSuggestedArticles(prev => prev.filter(a => a.id !== article.id));
+  };
+  
+  const handleRejectSuggestion = async (id: string) => {
+    setSuggestedArticles(prev => prev.filter(a => a.id !== id));
+  };
+  
   const renderArticlesList = () => {
     if (loading) {
       return (
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-10">
           <div className="text-center">
             <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-nbBlue-200 border-t-nbBlue-600 mx-auto"></div>
             <p className="text-nbTextLight">Loading your articles...</p>
@@ -35,7 +97,7 @@ const Home = () => {
     
     if (error) {
       return (
-        <div className="py-10 text-center">
+        <div className="py-6 text-center">
           <p className="text-red-500 mb-4">{error}</p>
           <Button onClick={fetchArticles} variant="outline">
             Try again
@@ -46,7 +108,7 @@ const Home = () => {
     
     if (articles.length === 0) {
       return (
-        <div className="py-16 text-center">
+        <div className="py-10 text-center">
           <BookOpen size={48} className="mx-auto mb-4 text-nbTextLight opacity-50" />
           <h3 className="text-xl font-medium mb-2">Your library is empty</h3>
           <p className="text-nbTextLight mb-6 max-w-md mx-auto">
@@ -57,15 +119,50 @@ const Home = () => {
     }
     
     return (
-      <div className="grid grid-cols-1 gap-6">
-        {articles.map((article: Article) => (
-          <ArticleCard
-            key={article.id}
-            article={article}
-            onDelete={handleDeleteArticle}
-          />
-        ))}
-      </div>
+      <Carousel className="w-full pb-8">
+        <CarouselContent>
+          {articles.map((article: Article) => (
+            <CarouselItem key={article.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <ArticleCard
+                article={article}
+                onDelete={handleDeleteArticle}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="-left-4" />
+        <CarouselNext className="-right-4" />
+      </Carousel>
+    );
+  };
+  
+  const renderSuggestedArticles = () => {
+    if (suggestedArticles.length === 0) {
+      return (
+        <div className="text-center py-4">
+          <p className="text-nbTextLight">No suggested articles at this time</p>
+        </div>
+      );
+    }
+    
+    return (
+      <Carousel className="w-full pb-8">
+        <CarouselContent>
+          {suggestedArticles.map((article: Article) => (
+            <CarouselItem key={article.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <ArticleCard
+                article={article}
+                onDelete={handleDeleteArticle}
+                suggested={true}
+                onAccept={handleAcceptSuggestion}
+                onReject={handleRejectSuggestion}
+              />
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="-left-4" />
+        <CarouselNext className="-right-4" />
+      </Carousel>
     );
   };
   
@@ -89,6 +186,13 @@ const Home = () => {
       </div>
       
       {renderArticlesList()}
+      
+      <div className="mt-10 mb-4">
+        <h2 className="text-xl font-semibold text-nbText">Suggested by Friends</h2>
+        <p className="text-nbTextLight text-sm">Articles your network thinks you might enjoy</p>
+      </div>
+      
+      {renderSuggestedArticles()}
     </div>
   );
 };
