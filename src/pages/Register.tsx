@@ -16,46 +16,39 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, Check } from "lucide-react";
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isValidUsername, setIsValidUsername] = useState<boolean | null>(null);
+  const [isValidUsername, setIsValidUsername] = useState<boolean | null>(
+    null
+  );
 
   const { register, loading } = useAuth();
   const navigate = useNavigate();
 
-  const validateUsername = (value: string) => {
-    if (value.length >= 3) setIsValidUsername(true);
-    else setIsValidUsername(null);
-  };
-
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-    validateUsername(e.target.value);
-  };
+  const validateUsername = (v: string) => setIsValidUsername(v.length >= 3);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("First and last name are required");
+      return;
+    }
     if (!username.trim()) {
       setError("Username is required");
       return;
     }
-    if (!name.trim() || !surname.trim()) {
-      setError("Both first and last name are required");
-      return;
-    }
 
     try {
-      // pass name + surname into register
-      await register(email, password, username, name, surname);
+      await register(email, password, username, firstName, lastName);
       navigate("/");
-    } catch (err: any) {
-      setError(err.message || "Registration failed. Please try again.");
+    } catch {
+      setError("Registration failed. Please try again.");
     }
   };
 
@@ -84,25 +77,31 @@ const Register = () => {
                 </div>
               )}
 
-              {/* First name */}
+              {/* First Name */}
               <div className="space-y-2">
-                <Label htmlFor="name">First Name <span className="text-red-500">*</span></Label>
+                <Label htmlFor="firstName">
+                  First Name <span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   required
+                  placeholder="John"
                 />
               </div>
 
-              {/* Last name */}
+              {/* Last Name */}
               <div className="space-y-2">
-                <Label htmlFor="surname">Last Name <span className="text-red-500">*</span></Label>
+                <Label htmlFor="lastName">
+                  Last Name <span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="surname"
-                  value={surname}
-                  onChange={(e) => setSurname(e.target.value)}
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   required
+                  placeholder="Doe"
                 />
               </div>
 
@@ -115,14 +114,17 @@ const Register = () => {
                   <Input
                     id="username"
                     value={username}
-                    onChange={handleUsernameChange}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      validateUsername(e.target.value);
+                    }}
                     required
-                    placeholder="Choose a unique username"
+                    placeholder="your.username"
                     className={
                       username.length > 2
                         ? isValidUsername
                           ? "pr-10 border-green-500"
-                          : "pr-10"
+                          : "pr-10 border-red-500"
                         : ""
                     }
                     minLength={3}
@@ -130,6 +132,11 @@ const Register = () => {
                   {username.length > 2 && isValidUsername && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                       <Check className="h-5 w-5 text-green-500" />
+                    </div>
+                  )}
+                  {username.length > 2 && isValidUsername === false && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <AlertCircle className="h-5 w-5 text-red-500" />
                     </div>
                   )}
                 </div>
@@ -149,7 +156,7 @@ const Register = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="your@email.com"
+                  placeholder="you@example.com"
                 />
               </div>
 

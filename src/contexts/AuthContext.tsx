@@ -33,51 +33,55 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Listen for Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
+    const unsub = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
         setUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email || "",
-          username: firebaseUser.displayName || undefined,
+          id: fbUser.uid,
+          email: fbUser.email || "",
+          username: fbUser.displayName || undefined,
         });
       } else {
         setUser(null);
       }
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
+  // Login
   const login = async (email: string, password: string) => {
     const u = await loginUser(email, password);
     setUser(u);
   };
 
-  // <-- updated register signature
+  // ↓↓↓ NEW register signature matching authService ↓↓↓
   const register = async (
     email: string,
     password: string,
     username: string,
-    name: string,
-    surname: string
+    firstName: string,
+    lastName: string
   ) => {
     const u = await registerUser(
       email,
       password,
       username,
-      name,
-      surname
+      firstName,
+      lastName
     );
     setUser(u);
   };
 
+  // Update username
   const updateUsername = async (username: string) => {
     if (!user) throw new Error("No user to update");
     await updateUserUsername(user.id, username);
     setUser({ ...user, username });
   };
 
+  // Logout
   const logout = () => {
     logoutUser();
     setUser(null);

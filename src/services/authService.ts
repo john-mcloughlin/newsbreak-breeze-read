@@ -27,35 +27,34 @@ export const loginUser = async (
 
     toast.success("Successfully logged in!");
     return user;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Login failed:", error);
     toast.error("Login failed. Please check your credentials.");
     throw error;
   }
 };
 
-// Register function (now takes name & surname)
+// ↓↓↓ Entirely replace your old registerUser with this ↓↓↓
 export const registerUser = async (
   email: string,
   password: string,
   username: string,
-  name: string,
-  surname: string
+  firstName: string,
+  lastName: string
 ): Promise<User> => {
   try {
-    // 1) Create user in Firebase
-    const userCredential = await createUserWithEmailAndPassword(
+    // 1) Create in Firebase Auth
+    const userCred = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
-    const firebaseUser = userCredential.user;
-    const uid = firebaseUser.uid;
+    const uid = userCred.user.uid;
 
-    // 2) Update displayName in Firebase
-    await updateProfile(firebaseUser, { displayName: username });
+    // 2) Store displayName
+    await updateProfile(userCred.user, { displayName: username });
 
-    // 3) Save profile in MySQL via your PHP script
+    // 3) Insert into your MySQL via PHP endpoint
     const res = await fetch(
       "https://sanoma.adm.pizza/create_user.php",
       {
@@ -64,34 +63,29 @@ export const registerUser = async (
         body: new URLSearchParams({
           firebase_uid: uid,
           username,
-          name,
-          surname,
+          first_name: firstName,
+          last_name: lastName,
         }),
       }
     );
-
-    if (res.status === 201) {
-      toast.success("Successfully registered!");
-    } else if (res.status === 409) {
-      toast.error("Username already taken");
-      throw new Error("Username already taken");
-    } else {
-      const text = await res.text();
-      toast.error("Profile save failed: " + text);
-      throw new Error(text);
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error("MySQL insert failed:", txt);
+      throw new Error("Load failed");
     }
 
-    // 4) Return our app‐level user object
-    return {
+    // 4) Return app User
+    const user: User = {
       id: uid,
-      email: firebaseUser.email || "",
+      email: userCred.user.email || "",
       username,
-      name,
-      surname,
     };
-  } catch (error: any) {
+
+    toast.success("Successfully registered!");
+    return user;
+  } catch (error) {
     console.error("Registration failed:", error);
-    toast.error(error.message || "Registration failed");
+    toast.error((error as Error).message || "Registration failed");
     throw error;
   }
 };
@@ -102,18 +96,17 @@ export const updateUserUsername = async (
   newUsername: string
 ): Promise<void> => {
   if (!auth.currentUser) throw new Error("No authenticated user");
-
   try {
     await updateProfile(auth.currentUser, { displayName: newUsername });
     toast.success("Username updated successfully");
-  } catch (error: any) {
+  } catch (error) {
     console.error("Failed to update username:", error);
-    toast.error(error.message || "Failed to update username");
+    toast.error((error as Error).message || "Failed to update username");
     throw error;
   }
 };
 
-// Logout
+// Logout function
 export const logoutUser = (): void => {
   signOut(auth);
   toast.info("You have been logged out");
