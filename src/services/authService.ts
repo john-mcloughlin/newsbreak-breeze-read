@@ -34,7 +34,7 @@ export const loginUser = async (
   }
 };
 
-// Register function
+// Registration
 export const registerUser = async (
   email: string,
   password: string,
@@ -51,31 +51,34 @@ export const registerUser = async (
     );
     const uid = userCred.user.uid;
 
-    // 2) Store displayName
+    // 2) Store displayName in Firebase
     await updateProfile(userCred.user, { displayName: username });
 
     // 3) Insert into your MySQL via PHP endpoint
-    const res = await fetch("https://sanoma.adm.pizza/create_user.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        firebase_uid: uid,
-        username,
-        first_name: firstName,
-        last_name: lastName,
-      }),
-    });
+    //    ←─── FIXED URL HERE ───→
+    const res = await fetch(
+      "https://sanoma.adm.pizza/php/users/create_user.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          firebase_uid: uid,
+          username,
+          first_name: firstName,
+          last_name: lastName,
+        }),
+      }
+    );
 
     console.log("create_user.php status:", res.status);
     const text = await res.text();
     console.log("create_user.php response:", text);
 
     if (!res.ok) {
-      // this covers both HTTP errors and your PHP returning 400/500
       throw new Error(`Load failed: ${res.status} ${text}`);
     }
 
-    // 4) Return application-level User
+    // 4) Return our app User
     const user: User = {
       id: uid,
       email: userCred.user.email || "",
