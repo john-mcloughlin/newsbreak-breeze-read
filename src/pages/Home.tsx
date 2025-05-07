@@ -120,18 +120,20 @@ const Home = () => {
     
     return (
       <Carousel className="w-full pb-8">
-        <CarouselContent>
+        <CarouselContent className="-ml-4 md:-ml-6">
           {articles.map((article: Article) => (
-            <CarouselItem key={article.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <ArticleCard
-                article={article}
-                onDelete={handleDeleteArticle}
-              />
+            <CarouselItem key={article.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <div className="p-1">
+                <ArticleCard
+                  article={article}
+                  onDelete={handleDeleteArticle}
+                />
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="-left-4" />
-        <CarouselNext className="-right-4" />
+        <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
+        <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
       </Carousel>
     );
   };
@@ -147,21 +149,23 @@ const Home = () => {
     
     return (
       <Carousel className="w-full pb-8">
-        <CarouselContent>
+        <CarouselContent className="-ml-4 md:-ml-6">
           {suggestedArticles.map((article: Article) => (
-            <CarouselItem key={article.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <ArticleCard
-                article={article}
-                onDelete={handleDeleteArticle}
-                suggested={true}
-                onAccept={handleAcceptSuggestion}
-                onReject={handleRejectSuggestion}
-              />
+            <CarouselItem key={article.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <div className="p-1">
+                <ArticleCard
+                  article={article}
+                  onDelete={handleDeleteArticle}
+                  suggested={true}
+                  onAccept={handleAcceptSuggestion}
+                  onReject={handleRejectSuggestion}
+                />
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="-left-4" />
-        <CarouselNext className="-right-4" />
+        <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
+        <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
       </Carousel>
     );
   };

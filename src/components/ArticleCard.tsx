@@ -43,13 +43,13 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
   };
   
   return (
-    <Card className="w-[280px] h-[320px] flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-all">
+    <Card className="w-[280px] h-[320px] flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 card-hover bg-white hover:bg-nbBackground">
       <div className="h-40 bg-nbBlue-50 overflow-hidden">
         {article.imageUrl ? (
           <img
             src={article.imageUrl}
             alt={article.title}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center bg-nbBlue-50 text-nbTextLight">
@@ -73,7 +73,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
             <div className="flex gap-2">
               <Button 
                 size="sm" 
-                className="flex-1" 
+                className="flex-1 hover:bg-nbBlue-600 transition-colors" 
                 onClick={() => onAccept && onAccept(article)}
               >
                 Save
@@ -81,7 +81,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
               <Button 
                 size="sm" 
                 variant="outline" 
-                className="flex-1" 
+                className="flex-1 hover:bg-nbBlue-50 transition-colors" 
                 onClick={() => onReject && onReject(article.id)}
               >
                 Ignore
@@ -100,7 +100,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
               
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm" disabled={isDeleting}>
+                  <Button variant="ghost" size="sm" disabled={isDeleting} className="hover:bg-red-100 transition-colors">
                     <Trash size={16} className="text-nbTextLight hover:text-red-500 transition-colors" />
                   </Button>
                 </AlertDialogTrigger>
