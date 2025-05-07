@@ -34,7 +34,7 @@ export const loginUser = async (
   }
 };
 
-// ↓↓↓ Entirely replace your old registerUser with this ↓↓↓
+// Register function
 export const registerUser = async (
   email: string,
   password: string,
@@ -71,11 +71,11 @@ export const registerUser = async (
     console.log("create_user.php response:", text);
 
     if (!res.ok) {
-      console.error("MySQL insert failed:", text);
+      // this covers both HTTP errors and your PHP returning 400/500
       throw new Error(`Load failed: ${res.status} ${text}`);
     }
 
-    // 4) Return app User
+    // 4) Return application-level User
     const user: User = {
       id: uid,
       email: userCred.user.email || "",
