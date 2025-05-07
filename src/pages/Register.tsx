@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,46 +12,31 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { doc, getDoc } from "firebase/firestore";
-import { firestore } from "@/lib/firebase";
 import { AlertCircle, Check } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
-  const [checkingUsername, setCheckingUsername] = useState(false);
+  const [isValidUsername, setIsValidUsername] = useState<boolean | null>(null);
   const { register, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Check username availability when username changes
-  useEffect(() => {
-    const checkUsernameAvailability = async () => {
-      // Reset state
-      setUsernameAvailable(null);
-      
-      // Only check if username has at least 3 characters
-      if (username.length < 3) return;
-      
-      setCheckingUsername(true);
-      try {
-        const usernameRef = doc(firestore, "usernames", username);
-        const usernameSnap = await getDoc(usernameRef);
-        setUsernameAvailable(!usernameSnap.exists());
-      } catch (err) {
-        console.error("Error checking username:", err);
-      } finally {
-        setCheckingUsername(false);
-      }
-    };
+  // Validate username (simple client-side validation)
+  const validateUsername = (value: string) => {
+    if (value.length >= 3) {
+      setIsValidUsername(true);
+    } else {
+      setIsValidUsername(null);
+    }
+  }
 
-    // Debounce check to avoid too many requests
-    const timeoutId = setTimeout(checkUsernameAvailability, 500);
-    return () => clearTimeout(timeoutId);
-  }, [username]);
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setUsername(value);
+    validateUsername(value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +44,6 @@ const Register = () => {
     
     if (!username.trim()) {
       setError("Username is required");
-      return;
-    }
-    
-    if (!usernameAvailable) {
-      setError("This username is already taken. Please choose another one.");
       return;
     }
     
@@ -104,30 +84,18 @@ const Register = () => {
                   <Input
                     id="username"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={handleUsernameChange}
                     required
                     placeholder="Choose a unique username"
-                    className={username.length > 2 ? (usernameAvailable ? "pr-10 border-green-500" : "pr-10 border-red-500") : ""}
+                    className={username.length > 2 ? (isValidUsername ? "pr-10 border-green-500" : "pr-10") : ""}
                     minLength={3}
                   />
-                  {username.length > 2 && !checkingUsername && (
+                  {username.length > 2 && isValidUsername && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      {usernameAvailable ? (
-                        <Check className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <AlertCircle className="h-5 w-5 text-red-500" />
-                      )}
+                      <Check className="h-5 w-5 text-green-500" />
                     </div>
                   )}
                 </div>
-                {username.length > 2 && !checkingUsername && (
-                  <div className="text-xs">
-                    {usernameAvailable ? 
-                      <span className="text-green-600">Username available!</span> : 
-                      <span className="text-red-600">Username already taken</span>
-                    }
-                  </div>
-                )}
                 <p className="text-xs text-nbTextLight">This will be your unique identifier on news.break</p>
               </div>
               
@@ -156,7 +124,7 @@ const Register = () => {
                 />
               </div>
               
-              <Button type="submit" className="w-full" disabled={loading || (username.length > 2 && !usernameAvailable)}>
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Creating account..." : "Sign Up"}
               </Button>
               

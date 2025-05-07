@@ -46,11 +46,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   // Login function
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<void> => {
     try {
       const user = await loginUser(email, password);
       setUser(user);
-      return user;
     } catch (error) {
       console.error("Login error in context:", error);
       throw error;
@@ -58,11 +57,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   // Register function
-  const register = async (email: string, password: string, username: string) => {
+  const register = async (email: string, password: string, username: string): Promise<void> => {
     try {
       const user = await registerUser(email, password, username);
       setUser(user);
-      return user;
     } catch (error) {
       console.error("Registration error in context:", error);
       throw error;
@@ -70,7 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   // Update username function
-  const updateUsername = async (username: string) => {
+  const updateUsername = async (username: string): Promise<void> => {
     try {
       if (user) {
         await updateUserUsername(user.id, username);
