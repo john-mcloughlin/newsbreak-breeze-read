@@ -1,11 +1,7 @@
-// src/types/auth.ts
-
 export interface User {
   id: string;
   email: string;
   username?: string;
-  name?: string;
-  surname?: string;
 }
 
 export interface AuthContextType {
@@ -16,8 +12,8 @@ export interface AuthContextType {
     email: string,
     password: string,
     username: string,
-    name: string,
-    surname: string
+    firstName: string,
+    lastName: string
   ) => Promise<void>;
   updateUsername: (username: string) => Promise<void>;
   logout: () => void;

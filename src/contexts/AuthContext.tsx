@@ -1,5 +1,3 @@
-// src/contexts/AuthContext.tsx
-
 import {
   createContext,
   useContext,
@@ -52,11 +50,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Login
   const login = async (email: string, password: string) => {
-    const u = await loginUser(email, password);
-    setUser(u);
+    setLoading(true);
+    try {
+      const u = await loginUser(email, password);
+      setUser(u);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // ↓↓↓ NEW register signature matching authService ↓↓↓
+  // Register
   const register = async (
     email: string,
     password: string,
@@ -64,21 +67,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     firstName: string,
     lastName: string
   ) => {
-    const u = await registerUser(
-      email,
-      password,
-      username,
-      firstName,
-      lastName
-    );
-    setUser(u);
+    setLoading(true);
+    try {
+      const u = await registerUser(
+        email,
+        password,
+        username,
+        firstName,
+        lastName
+      );
+      setUser(u);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Update username
   const updateUsername = async (username: string) => {
     if (!user) throw new Error("No user to update");
-    await updateUserUsername(user.id, username);
-    setUser({ ...user, username });
+    setLoading(true);
+    try {
+      await updateUserUsername(user.id, username);
+      setUser({ ...user, username });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Logout

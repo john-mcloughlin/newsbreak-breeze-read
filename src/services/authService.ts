@@ -8,6 +8,8 @@ import {
 import { auth } from "@/lib/firebase";
 import { User } from "@/types/auth";
 
+const API_BASE = process.env.REACT_APP_API_BASE || "https://sanoma.adm.pizza";
+
 // Login function
 export const loginUser = async (
   email: string,
@@ -53,26 +55,20 @@ export const registerUser = async (
     await updateProfile(userCred.user, { displayName: username });
 
     // 3) Insert into MySQL via your PHP endpoint
-    const res = await fetch(
-      "https://sanoma.adm.pizza/users/create_user.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          firebase_uid: uid,
-          username,
-          name: firstName,
-          surname: lastName,
-        }),
-      }
-    );
+    const res = await fetch(`${API_BASE}/users/create_user.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        firebase_uid: uid,
+        username,
+        name: firstName,
+        surname: lastName,
+      }),
+    });
 
-    console.log("create_user.php status:", res.status);
-    const text = await res.text();
-    console.log("create_user.php response:", text);
-
-    if (!res.ok) {
-      throw new Error(`Load failed: ${res.status} ${text}`);
+    const data = await res.json();
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.message || `Create failed: ${res.status}`);
     }
 
     // 4) Return our app User object

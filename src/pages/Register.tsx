@@ -1,5 +1,3 @@
-// src/pages/Register.tsx
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,8 +45,8 @@ const Register = () => {
     try {
       await register(email, password, username, firstName, lastName);
       navigate("/");
-    } catch {
-      setError("Registration failed. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
     }
   };
 
@@ -176,7 +174,11 @@ const Register = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || isValidUsername === false}
+              >
                 {loading ? "Creating account..." : "Sign Up"}
               </Button>
 
