@@ -57,7 +57,7 @@ export const registerUser = async (
     // 3) Insert into your MySQL via PHP endpoint
     //    ←─── FIXED URL HERE ───→
     const res = await fetch(
-      "https://sanoma.adm.pizza/php/users/create_user.php",
+      "https://sanoma.adm.pizza/users/create_user.php",
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
