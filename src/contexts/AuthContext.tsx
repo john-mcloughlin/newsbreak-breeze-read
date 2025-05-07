@@ -1,19 +1,27 @@
+// src/contexts/AuthContext.tsx
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  updateUserUsername,
+} from "@/services/authService";
 import { User, AuthContextType } from "@/types/auth";
-import { loginUser, registerUser, logoutUser, updateUserUsername } from "@/services/authService";
 
-// Create the auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
 
@@ -21,7 +29,6 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Auth provider component
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,72 +36,58 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        // Convert Firebase user to our User type
-        const appUser: User = {
+        setUser({
           id: firebaseUser.uid,
           email: firebaseUser.email || "",
           username: firebaseUser.displayName || undefined,
-        };
-        setUser(appUser);
+        });
       } else {
         setUser(null);
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  // Login function
-  const login = async (email: string, password: string): Promise<void> => {
-    try {
-      const user = await loginUser(email, password);
-      setUser(user);
-    } catch (error) {
-      console.error("Login error in context:", error);
-      throw error;
-    }
+  const login = async (email: string, password: string) => {
+    const u = await loginUser(email, password);
+    setUser(u);
   };
 
-  // Register function
-  const register = async (email: string, password: string, username: string): Promise<void> => {
-    try {
-      const user = await registerUser(email, password, username);
-      setUser(user);
-    } catch (error) {
-      console.error("Registration error in context:", error);
-      throw error;
-    }
+  // <-- updated register signature
+  const register = async (
+    email: string,
+    password: string,
+    username: string,
+    name: string,
+    surname: string
+  ) => {
+    const u = await registerUser(
+      email,
+      password,
+      username,
+      name,
+      surname
+    );
+    setUser(u);
   };
 
-  // Update username function
-  const updateUsername = async (username: string): Promise<void> => {
-    try {
-      if (user) {
-        await updateUserUsername(user.id, username);
-        // Update local state with new username
-        setUser({ ...user, username });
-      }
-    } catch (error) {
-      console.error("Update username error:", error);
-      throw error;
-    }
+  const updateUsername = async (username: string) => {
+    if (!user) throw new Error("No user to update");
+    await updateUserUsername(user.id, username);
+    setUser({ ...user, username });
   };
 
-  // Logout function
   const logout = () => {
     logoutUser();
     setUser(null);
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    updateUsername,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{ user, loading, login, register, updateUsername, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

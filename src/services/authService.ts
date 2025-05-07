@@ -1,3 +1,4 @@
+// src/services/authService.ts
 
 import { toast } from "sonner";
 import {
@@ -9,76 +10,110 @@ import {
 import { auth } from "@/lib/firebase";
 import { User } from "@/types/auth";
 
-// Simulated username storage (would typically be in your new database)
-const usernames = new Set();
-
 // Login function
-export const loginUser = async (email: string, password: string): Promise<User> => {
+export const loginUser = async (
+  email: string,
+  password: string
+): Promise<User> => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const firebaseUser = result.user;
 
-    const user = {
+    const user: User = {
       id: firebaseUser.uid,
       email: firebaseUser.email || "",
-      username: firebaseUser.displayName || undefined
+      username: firebaseUser.displayName || undefined,
     };
 
     toast.success("Successfully logged in!");
     return user;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login failed:", error);
     toast.error("Login failed. Please check your credentials.");
     throw error;
   }
 };
 
-// Register function
-export const registerUser = async (email: string, password: string, username: string): Promise<User> => {
+// Register function (now takes name & surname)
+export const registerUser = async (
+  email: string,
+  password: string,
+  username: string,
+  name: string,
+  surname: string
+): Promise<User> => {
   try {
-    // Create user with Firebase Authentication
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
+    // 1) Create user in Firebase
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const firebaseUser = userCredential.user;
+    const uid = firebaseUser.uid;
 
-    // Update displayName
-    await updateProfile(userCredential.user, {
-      displayName: username
-    });
+    // 2) Update displayName in Firebase
+    await updateProfile(firebaseUser, { displayName: username });
 
-    const user = {
+    // 3) Save profile in MySQL via your PHP script
+    const res = await fetch(
+      "https://yourdomain.com/php/create_user.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          firebase_uid: uid,
+          username,
+          name,
+          surname,
+        }),
+      }
+    );
+
+    if (res.status === 201) {
+      toast.success("Successfully registered!");
+    } else if (res.status === 409) {
+      toast.error("Username already taken");
+      throw new Error("Username already taken");
+    } else {
+      const text = await res.text();
+      toast.error("Profile save failed: " + text);
+      throw new Error(text);
+    }
+
+    // 4) Return our app‐level user object
+    return {
       id: uid,
-      email: userCredential.user.email || "",
-      username: username
+      email: firebaseUser.email || "",
+      username,
+      name,
+      surname,
     };
-
-    toast.success("Successfully registered!");
-    return user;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration failed:", error);
-    toast.error((error as Error).message);
+    toast.error(error.message || "Registration failed");
     throw error;
   }
 };
 
 // Update username
-export const updateUserUsername = async (userId: string, newUsername: string): Promise<void> => {
-  if (!auth.currentUser) {
-    throw new Error("No authenticated user");
-  }
-  
+export const updateUserUsername = async (
+  userId: string,
+  newUsername: string
+): Promise<void> => {
+  if (!auth.currentUser) throw new Error("No authenticated user");
+
   try {
-    // Update Firebase Auth display name
     await updateProfile(auth.currentUser, { displayName: newUsername });
-    
     toast.success("Username updated successfully");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to update username:", error);
-    toast.error((error as Error).message || "Failed to update username");
+    toast.error(error.message || "Failed to update username");
     throw error;
   }
 };
 
-// Logout function
+// Logout
 export const logoutUser = (): void => {
   signOut(auth);
   toast.info("You have been logged out");
