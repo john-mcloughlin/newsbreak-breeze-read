@@ -95,17 +95,17 @@ const Home = () => {
   };
   
 const renderArticlesList = () => {
-  if (loading)   { /* … */ }
-  if (error)     { /* … */ }
-  if (articles.length === 0) { /* … */ }
+  if (loading)   { /* …unchanged… */ }
+  if (error)     { /* …unchanged… */ }
+  if (articles.length === 0) { /* …unchanged… */ }
 
   return (
     <Carousel className="w-full pb-8">
       <CarouselContent
         className="
+          -mx-6 md:-mx-8
           flex-nowrap overflow-x-auto scroll-smooth
           snap-x snap-mandatory
-          -mx-4 md:-mx-6
         "
       >
         {articles.map((article: Article) => (
@@ -113,15 +113,15 @@ const renderArticlesList = () => {
             key={article.id}
             className="
               snap-start flex-shrink-0
-              px-4 md:px-6
-              basis-full
-              sm:basis-1/2
-              md:basis-1/3
-              lg:basis-1/4
-              xl:basis-1/5
+              px-6 md:px-8
+              basis-full       /* 1 per row on xs */
+              sm:basis-2/3     /* ~2 per row on sm */
+              md:basis-1/2     /* 2 per row on md */
+              lg:basis-1/3     /* 3 per row on lg */
+              xl:basis-1/4     /* 4 per row on xl */
             "
           >
-            <div className="p-2">
+            <div className="p-4">
               <ArticleCard
                 article={article}
                 onDelete={handleDeleteArticle}
@@ -133,9 +133,10 @@ const renderArticlesList = () => {
 
       {/* arrows for non-touch */}
       <div className="hidden md:block">
-        <CarouselPrevious className="z-10 -left-6 lg:-left-12" />
-        <CarouselNext     className="z-10 -right-6 lg:-right-12" />
+        <CarouselPrevious className="z-10 -left-6 lg:-left-12 bg-white hover:bg-nbBackground" />
+        <CarouselNext     className="z-10 -right-6 lg:-right-12 bg-white hover:bg-nbBackground" />
       </div>
+
       {/* swipe hint for mobile */}
       <div className="block mt-4 md:hidden">
         <p className="text-xs text-center text-nbTextLight">
@@ -147,61 +148,55 @@ const renderArticlesList = () => {
 };
 
 const renderSuggestedArticles = () => {
-  if (suggestedArticles.length === 0) {
-    return (
-      <div className="text-center py-4">
-        <p className="text-nbTextLight">No suggested articles at this time</p>
-      </div>
-    );
-  }
+  if (suggestedArticles.length === 0) { /* …unchanged… */ }
 
   return (
-    <div className="relative px-4 md:px-12">
-      <Carousel className="w-full pb-8">
-        <CarouselContent
-          className="
-            -ml-4 md:-ml-6
-            flex-nowrap
-            snap-x snap-mandatory
-          "
-        >
-          {suggestedArticles.map((article: Article) => (
-            <CarouselItem
-              key={article.id}
-              className="
-                pl-4 md:pl-6
-                snap-start flex-shrink-0
-                w-full sm:w-[calc(100%/2-16px)] md:w-[calc(100%/2-24px)] lg:w-[calc(100%/3-24px)] xl:w-[calc(100%/4-24px)]
-                min-w-[280px]
-              "
-            >
-              <div className="p-2">
-                <ArticleCard
-                  article={article}
-                  onDelete={handleDeleteArticle}
-                  suggested={true}
-                  onAccept={handleAcceptSuggestion}
-                  onReject={handleRejectSuggestion}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+    <Carousel className="w-full pb-8">
+      <CarouselContent
+        className="
+          -mx-6 md:-mx-8
+          flex-nowrap overflow-x-auto scroll-smooth
+          snap-x snap-mandatory
+        "
+      >
+        {suggestedArticles.map((article: Article) => (
+          <CarouselItem
+            key={article.id}
+            className="
+              snap-start flex-shrink-0
+              px-6 md:px-8
+              basis-full
+              sm:basis-2/3
+              md:basis-1/2
+              lg:basis-1/3
+              xl:basis-1/4
+            "
+          >
+            <div className="p-4">
+              <ArticleCard
+                article={article}
+                onDelete={handleDeleteArticle}
+                suggested
+                onAccept={handleAcceptSuggestion}
+                onReject={handleRejectSuggestion}
+              />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
 
-        <div className="block mt-4 md:hidden">
-          <p className="text-xs text-center text-nbTextLight">Swipe to see more articles</p>
-        </div>
-
-        <div className="hidden md:block">
-          <CarouselPrevious className="z-10 -left-6 lg:-left-12" />
-          <CarouselNext className="z-10 -right-6 lg:-right-12" />
-        </div>
-      </Carousel>
-    </div>
+      <div className="hidden md:block">
+        <CarouselPrevious className="z-10 -left-6 lg:-left-12 bg-white hover:bg-nbBackground" />
+        <CarouselNext     className="z-10 -right-6 lg:-right-12 bg-white hover:bg-nbBackground" />
+      </div>
+      <div className="block mt-4 md:hidden">
+        <p className="text-xs text-center text-nbTextLight">
+          Swipe to see more articles
+        </p>
+      </div>
+    </Carousel>
   );
 };
-
-
   
   return (
     <div className="nb-container pt-6">
