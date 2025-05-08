@@ -7,8 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, UserCheck, UserPlus, X, Check } from "lucide-react";
+import { Search, UserCheck, UserPlus, X, Check, Undo } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock data for friends
 type Friend = {
@@ -26,6 +27,7 @@ const Friends = () => {
   const [myFriends, setMyFriends] = useState<Friend[]>([]);
   const [pendingRequests, setPendingRequests] = useState<Friend[]>([]);
   const [sentRequests, setSentRequests] = useState<Friend[]>([]);
+  const isMobile = useIsMobile();
 
   // Fetch mock data
   useEffect(() => {
@@ -59,10 +61,10 @@ const Friends = () => {
     // Mock search - in a real app, this would be an API call
     setTimeout(() => {
       // Mock results that might include existing friends
-      const results = [
-        { id: "s1", username: searchQuery.toLowerCase(), status: "pending" },
-        { id: "f1", username: "emma_watson", status: "friend", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb" },
-        { id: "s3", username: `${searchQuery.toLowerCase()}_fan`, status: "requested" },
+      const results: Friend[] = [
+        { id: "s1", username: searchQuery.toLowerCase(), status: "pending" as const },
+        { id: "f1", username: "emma_watson", status: "friend" as const, avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb" },
+        { id: "s3", username: `${searchQuery.toLowerCase()}_fan`, status: "requested" as const },
       ];
       
       setSearchResults(results);
@@ -70,23 +72,28 @@ const Friends = () => {
     }, 800);
   };
 
-  const handleFriendAction = (userId: string, action: "add" | "accept" | "reject" | "remove") => {
+  const handleFriendAction = (userId: string, action: "add" | "accept" | "reject" | "remove" | "unsend") => {
     // In a real app, this would be an API call
     
     if (action === "add") {
       toast.success("Friend request sent!");
       // Update UI to show request sent
       setSearchResults(prev => prev.map(user => 
-        user.id === userId ? { ...user, status: "requested" } : user
+        user.id === userId ? { ...user, status: "requested" as const } : user
       ));
-      setSentRequests(prev => [...prev, searchResults.find(u => u.id === userId)!]);
+      const newFriend = searchResults.find(u => u.id === userId);
+      if (newFriend) {
+        setSentRequests(prev => [...prev, { ...newFriend, status: "requested" }]);
+      }
     } 
     else if (action === "accept") {
       toast.success("Friend request accepted!");
       // Move from pending to friends
-      const acceptedFriend = pendingRequests.find(request => request.id === userId)!;
-      setPendingRequests(prev => prev.filter(request => request.id !== userId));
-      setMyFriends(prev => [...prev, { ...acceptedFriend, status: "friend" }]);
+      const acceptedFriend = pendingRequests.find(request => request.id === userId);
+      if (acceptedFriend) {
+        setPendingRequests(prev => prev.filter(request => request.id !== userId));
+        setMyFriends(prev => [...prev, { ...acceptedFriend, status: "friend" }]);
+      }
     }
     else if (action === "reject") {
       toast.success("Friend request rejected");
@@ -97,6 +104,11 @@ const Friends = () => {
       toast.success("Friend removed");
       // Remove from friends
       setMyFriends(prev => prev.filter(friend => friend.id !== userId));
+    }
+    else if (action === "unsend") {
+      toast.success("Friend request canceled");
+      // Remove from sent requests
+      setSentRequests(prev => prev.filter(request => request.id !== userId));
     }
   };
 
@@ -126,25 +138,38 @@ const Friends = () => {
         <div>
           {friend.status === "friend" && (
             <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "remove")}>
-              Remove
+              {isMobile ? <X size={16} /> : "Remove"}
             </Button>
           )}
           {friend.status === "pending" && (
             <div className="flex gap-2">
               <Button variant="default" size="sm" onClick={() => handleFriendAction(friend.id, "accept")}>
-                <Check size={14} className="mr-1" /> Accept
+                {isMobile ? <Check size={16} /> : <><Check size={14} className="mr-1" /> Accept</>}
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "reject")}>
-                <X size={14} className="mr-1" /> Reject
+                {isMobile ? <X size={16} /> : <><X size={14} className="mr-1" /> Reject</>}
               </Button>
             </div>
           )}
           {friend.status === "requested" && (
-            <Badge variant="outline" className="text-muted-foreground">Request Sent</Badge>
+            <div>
+              {isMobile ? (
+                <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "unsend")}>
+                  <Undo size={16} />
+                </Button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-muted-foreground">Request Sent</Badge>
+                  <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "unsend")}>
+                    Unsend
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
           {!friend.status && (
             <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "add")}>
-              <UserPlus size={14} className="mr-1" /> Add Friend
+              {isMobile ? <UserPlus size={16} /> : <><UserPlus size={14} className="mr-1" /> Add Friend</>}
             </Button>
           )}
         </div>
@@ -221,7 +246,7 @@ const Friends = () => {
               <CardContent className="pt-6">
                 <h3 className="text-lg font-medium mb-3">Sent Requests</h3>
                 <div className="divide-y divide-border">
-                  {sentRequests.map(request => renderFriendItem(request, false))}
+                  {sentRequests.map(request => renderFriendItem(request))}
                 </div>
               </CardContent>
             </Card>
