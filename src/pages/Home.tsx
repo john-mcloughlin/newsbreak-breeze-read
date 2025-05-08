@@ -143,7 +143,7 @@ const Home = () => {
               xl:basis-1/4     /* 4 per row on xl+ */
             "
           >
-            <div className="p-3">
+            <div className="p-1">
               <ArticleCard
                 article={article}
                 onDelete={handleDeleteArticle}
