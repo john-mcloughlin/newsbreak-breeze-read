@@ -103,7 +103,7 @@ const Account = () => {
                 placeholder="Email"
                 required
                 disabled
-                className="bg-gray-100"
+                className="bg-gray-100 dark:bg-gray-800 text-foreground"
               />
               <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
             </div>

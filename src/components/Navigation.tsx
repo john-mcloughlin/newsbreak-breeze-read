@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, UserCheck } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -56,6 +56,14 @@ const Navigation = () => {
               The Break Room
             </Button>
             <Button
+              variant={location.pathname === "/friends" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => navigate("/friends")}
+            >
+              <UserCheck className="mr-1 h-4 w-4" />
+              Friends
+            </Button>
+            <Button
               variant={location.pathname === "/account" ? "default" : "ghost"}
               size="sm"
               onClick={() => navigate("/account")}
@@ -87,6 +95,14 @@ const Navigation = () => {
                     onClick={() => navigateTo("/summary")}
                   >
                     The Break Room
+                  </Button>
+                  <Button
+                    variant={location.pathname === "/friends" ? "default" : "ghost"}
+                    className="w-full justify-start"
+                    onClick={() => navigateTo("/friends")}
+                  >
+                    <UserCheck className="mr-2 h-4 w-4" />
+                    Friends
                   </Button>
                   <Button
                     variant={location.pathname === "/account" ? "default" : "ghost"}
@@ -123,6 +139,10 @@ const Navigation = () => {
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/summary")}>
                 The Break Room
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/friends")}>
+                <UserCheck className="mr-2 h-4 w-4" />
+                Friends
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/account")}>
                 My Account
