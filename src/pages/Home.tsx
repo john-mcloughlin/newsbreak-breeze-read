@@ -113,7 +113,7 @@ const renderArticlesList = () => {
             key={article.id}
             className="
               snap-start flex-shrink-0
-              px-6 md:px-8
+              px-6 md:px-0
               basis-full       /* 1 per row on xs */
               sm:basis-2/3     /* ~2 per row on sm */
               md:basis-1/2     /* 2 per row on md */
@@ -164,7 +164,7 @@ const renderSuggestedArticles = () => {
             key={article.id}
             className="
               snap-start flex-shrink-0
-              px-6 md:px-8
+              px-6 md:px-0
               basis-full
               sm:basis-2/3
               md:basis-1/2
