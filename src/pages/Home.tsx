@@ -93,7 +93,7 @@ const Home = () => {
     setSuggestedArticles(prev => prev.filter(a => a.id !== id));
   };
   
-  const renderArticlesList = () => {
+const renderArticlesList = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
@@ -129,21 +129,24 @@ const Home = () => {
   }
 
   return (
-    <Carousel className="w-full pb-8 px-8">
-      <CarouselContent className="-ml-6 md:-ml-8">
+    <Carousel className="w-full pb-8">
+      <CarouselContent
+        className="
+          -ml-6 md:-ml-8
+          flex-nowrap overflow-x-auto scroll-smooth
+          snap-x snap-mandatory
+        "
+      >
         {articles.map((article: Article) => (
           <CarouselItem
             key={article.id}
             className="
               pl-6 md:pl-8
-              basis-full       /* 1 per row on very small screens */
-              sm:basis-2/3     /* ~2 per row on small screens */
-              md:basis-1/3     /* 2 per row on md+ */
-              lg:basis-1/4     /* 3 per row on lg+ */
-              xl:basis-1/3     /* 4 per row on xl+ */
+              snap-start flex-shrink-0
+              basis-full sm:basis-2/3 md:basis-1/2 lg:basis-1/3 xl:basis-1/4
             "
           >
-            <div className="p-0">
+            <div className="p-4">
               <ArticleCard
                 article={article}
                 onDelete={handleDeleteArticle}
@@ -152,8 +155,10 @@ const Home = () => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
-      <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
+
+      {/* arrows remain, optionally pushed further out & above */}
+      <CarouselPrevious className="-left-12 z-10 bg-white hover:bg-nbBackground" />
+      <CarouselNext     className="-right-12 z-10 bg-white hover:bg-nbBackground" />
     </Carousel>
   );
 };
@@ -169,20 +174,23 @@ const renderSuggestedArticles = () => {
 
   return (
     <Carousel className="w-full pb-8">
-      <CarouselContent className="-ml-6 md:-ml-8">
+      <CarouselContent
+        className="
+          -ml-6 md:-ml-8
+          flex-nowrap overflow-x-auto scroll-smooth
+          snap-x snap-mandatory
+        "
+      >
         {suggestedArticles.map((article: Article) => (
           <CarouselItem
             key={article.id}
             className="
               pl-6 md:pl-8
-              basis-full
-              sm:basis-2/3
-              md:basis-1/2
-              lg:basis-1/3
-              xl:basis-1/4
+              snap-start flex-shrink-0
+              basis-full sm:basis-2/3 md:basis-1/2 lg:basis-1/3 xl:basis-1/4
             "
           >
-            <div className="p-3">
+            <div className="p-4">
               <ArticleCard
                 article={article}
                 onDelete={handleDeleteArticle}
@@ -194,11 +202,13 @@ const renderSuggestedArticles = () => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
-      <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
+
+      <CarouselPrevious className="-left-12 z-10 bg-white hover:bg-nbBackground" />
+      <CarouselNext     className="-right-12 z-10 bg-white hover:bg-nbBackground" />
     </Carousel>
   );
 };
+
 
   
   return (
