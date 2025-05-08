@@ -140,7 +140,7 @@ const Home = () => {
               sm:basis-2/3     /* ~2 per row on small screens */
               md:basis-1/3     /* 2 per row on md+ */
               lg:basis-1/4     /* 3 per row on lg+ */
-              xl:basis-1/6     /* 4 per row on xl+ */
+              xl:basis-1/5     /* 4 per row on xl+ */
             "
           >
             <div className="p-0">
