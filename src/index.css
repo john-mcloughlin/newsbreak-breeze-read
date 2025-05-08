@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -6,6 +7,7 @@
 
 @layer base {
   :root {
+    /* Light mode variables */
     --background: 210 20% 98%;
     --foreground: 224 25% 16%;
 
@@ -37,12 +39,43 @@
     --radius: 0.5rem;
   }
 
+  .dark {
+    /* Dark mode variables */
+    --background: 224 25% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 25% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 25% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 25% 16%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 25% 16%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+
+    --accent: 142 69% 38%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 25% 26.7%;
+    --input: 215 25% 26.7%;
+    --ring: 210 100% 63.9%;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-nbBackground text-nbText font-sans antialiased;
+    @apply bg-nbBackground text-nbText font-sans antialiased transition-colors duration-200;
   }
 }
 

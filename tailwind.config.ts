@@ -78,11 +78,27 @@ export default {
 					800: '#2E7D32',
 					900: '#1B5E20',
 				},
-				nbBackground: '#F8FAFC',
-				nbSurface: '#FFFFFF',
-				nbText: '#1C2033',
-				nbTextLight: '#626880',
-				nbBorder: '#E2E8F0',
+				nbBackground: {
+					DEFAULT: 'hsl(var(--background))',
+					light: '#F8FAFC',
+					dark: '#121420',
+				},
+				nbSurface: {
+					DEFAULT: 'hsl(var(--card))',
+					light: '#FFFFFF',
+					dark: '#1A1B26',
+				},
+				nbText: {
+					DEFAULT: 'hsl(var(--foreground))',
+					light: '#1C2033',
+					dark: '#FFFFFF',
+				},
+				nbTextLight: {
+					DEFAULT: 'hsl(var(--muted-foreground))',
+					light: '#626880',
+					dark: '#A9B1D6',
+				},
+				nbBorder: 'hsl(var(--border))',
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],

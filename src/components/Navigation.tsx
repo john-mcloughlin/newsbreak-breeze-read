@@ -13,6 +13,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Navigation = () => {
   const { user, logout } = useAuth();
@@ -27,7 +28,7 @@ const Navigation = () => {
   };
   
   return (
-    <header className="sticky top-0 z-10 border-b border-nbBorder bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-10 border-b border-nbBorder bg-white/80 dark:bg-nbText/80 backdrop-blur-md">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="text-xl font-bold text-nbBlue-700 flex items-center space-x-2">
@@ -36,6 +37,8 @@ const Navigation = () => {
         </div>
         
         <div className="flex items-center gap-4">
+          <ThemeToggle />
+          
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-1">
             <Button
@@ -132,8 +135,6 @@ const Navigation = () => {
           </DropdownMenu>
         </div>
       </div>
-
-      {/* Remove bottom mobile navigation since we now have a hamburger menu */}
     </header>
   );
 };

@@ -58,8 +58,8 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
   };
   
   return (
-    <Card className="w-full max-w-[280px] h-[320px] flex flex-col overflow-hidden shadow-sm card-hover bg-white hover:bg-nbBackground">
-      <div className="h-40 bg-nbBlue-50 overflow-hidden">
+    <Card className="w-full max-w-[280px] h-[320px] flex flex-col overflow-hidden shadow-sm card-hover bg-white dark:bg-nbSurface hover:bg-nbBackground dark:hover:bg-nbSurface/80">
+      <div className="h-40 bg-nbBlue-50 dark:bg-nbBlue-900/30 overflow-hidden">
         {article.imageUrl ? (
           <img
             src={article.imageUrl}
@@ -67,7 +67,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
             className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
           />
         ) : (
-          <div className="h-full w-full flex items-center justify-center bg-nbBlue-50 text-nbTextLight">
+          <div className="h-full w-full flex items-center justify-center bg-nbBlue-50 dark:bg-nbBlue-900/30 text-nbTextLight">
             No image
           </div>
         )}
@@ -78,7 +78,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
           <p className="text-xs text-nbTextLight mb-1">
             {article.source} • {formatSavedAt(article.savedAt)}
           </p>
-          <h3 className="text-md font-medium line-clamp-2 h-12">
+          <h3 className="text-md font-medium line-clamp-2 h-12 text-nbText">
             {article.title}
           </h3>
         </div>
@@ -97,7 +97,7 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
               <Button 
                 size="sm" 
                 variant="outline" 
-                className="flex-1 hover:bg-nbBlue-50 transition-colors" 
+                className="flex-1 hover:bg-nbBlue-50 dark:hover:bg-nbBlue-900/20 transition-colors" 
                 onClick={handleReject}
               >
                 Ignore
@@ -109,14 +109,14 @@ const ArticleCard = ({ article, onDelete, suggested = false, onAccept, onReject 
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-medium text-nbBlue-600 hover:text-nbBlue-800 transition-colors"
+                className="text-sm font-medium text-nbBlue-600 hover:text-nbBlue-800 dark:text-nbBlue-400 dark:hover:text-nbBlue-300 transition-colors"
               >
                 Read
               </a>
               
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm" disabled={isDeleting} className="hover:bg-red-100 transition-colors">
+                  <Button variant="ghost" size="sm" disabled={isDeleting} className="hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors">
                     <Trash size={16} className="text-nbTextLight hover:text-red-500 transition-colors" />
                   </Button>
                 </AlertDialogTrigger>
