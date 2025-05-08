@@ -143,7 +143,7 @@ const Home = () => {
               xl:basis-1/4     /* 4 per row on xl+ */
             "
           >
-            <div className="p-6">
+            <div className="p-3">
               <ArticleCard
                 article={article}
                 onDelete={handleDeleteArticle}
@@ -182,7 +182,7 @@ const renderSuggestedArticles = () => {
               xl:basis-1/4
             "
           >
-            <div className="p-6">
+            <div className="p-3">
               <ArticleCard
                 article={article}
                 onDelete={handleDeleteArticle}
