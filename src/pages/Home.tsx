@@ -94,91 +94,112 @@ const Home = () => {
   };
   
   const renderArticlesList = () => {
-    if (loading) {
-      return (
-        <div className="flex items-center justify-center py-10">
-          <div className="text-center">
-            <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-nbBlue-200 border-t-nbBlue-600 mx-auto"></div>
-            <p className="text-nbTextLight">Loading your articles...</p>
-          </div>
-        </div>
-      );
-    }
-    
-    if (error) {
-      return (
-        <div className="py-6 text-center">
-          <p className="text-red-500 mb-4">{error}</p>
-          <Button onClick={fetchArticles} variant="outline">
-            Try again
-          </Button>
-        </div>
-      );
-    }
-    
-    if (articles.length === 0) {
-      return (
-        <div className="py-10 text-center">
-          <BookOpen size={48} className="mx-auto mb-4 text-nbTextLight opacity-50" />
-          <h3 className="text-xl font-medium mb-2">Your library is empty</h3>
-          <p className="text-nbTextLight mb-6 max-w-md mx-auto">
-            Save articles using the browser extension to build your library.
-          </p>
-        </div>
-      );
-    }
-    
+  if (loading) {
     return (
-      <Carousel className="w-full pb-8">
-        <CarouselContent className="-ml-4 md:-ml-6">
-          {articles.map((article: Article) => (
-            <CarouselItem key={article.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <div className="p-3">
-                <ArticleCard
-                  article={article}
-                  onDelete={handleDeleteArticle}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
-        <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
-      </Carousel>
-    );
-  };
-  
-  const renderSuggestedArticles = () => {
-    if (suggestedArticles.length === 0) {
-      return (
-        <div className="text-center py-4">
-          <p className="text-nbTextLight">No suggested articles at this time</p>
+      <div className="flex items-center justify-center py-10">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-nbBlue-200 border-t-nbBlue-600 mx-auto"></div>
+          <p className="text-nbTextLight">Loading your articles...</p>
         </div>
-      );
-    }
-    
-    return (
-      <Carousel className="w-full pb-8">
-        <CarouselContent className="-ml-4 md:-ml-6">
-          {suggestedArticles.map((article: Article) => (
-            <CarouselItem key={article.id} className="pl-4 md:pl-6 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
-              <div className="p-3">
-                <ArticleCard
-                  article={article}
-                  onDelete={handleDeleteArticle}
-                  suggested={true}
-                  onAccept={handleAcceptSuggestion}
-                  onReject={handleRejectSuggestion}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
-        <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
-      </Carousel>
+      </div>
     );
-  };
+  }
+
+  if (error) {
+    return (
+      <div className="py-6 text-center">
+        <p className="text-red-500 mb-4">{error}</p>
+        <Button onClick={fetchArticles} variant="outline">
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
+  if (articles.length === 0) {
+    return (
+      <div className="py-10 text-center">
+        <BookOpen size={48} className="mx-auto mb-4 text-nbTextLight opacity-50" />
+        <h3 className="text-xl font-medium mb-2">Your library is empty</h3>
+        <p className="text-nbTextLight mb-6 max-w-md mx-auto">
+          Save articles using the browser extension to build your library.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <Carousel className="w-full pb-8">
+      <CarouselContent className="-ml-6 md:-ml-8">
+        {articles.map((article: Article) => (
+          <CarouselItem
+            key={article.id}
+            className="
+              pl-6 md:pl-8
+              basis-full       /* 1 per row on very small screens */
+              sm:basis-2/3     /* ~2 per row on small screens */
+              md:basis-1/2     /* 2 per row on md+ */
+              lg:basis-1/3     /* 3 per row on lg+ */
+              xl:basis-1/4     /* 4 per row on xl+ */
+            "
+          >
+            <div className="p-6">
+              <ArticleCard
+                article={article}
+                onDelete={handleDeleteArticle}
+              />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
+      <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
+    </Carousel>
+  );
+};
+
+const renderSuggestedArticles = () => {
+  if (suggestedArticles.length === 0) {
+    return (
+      <div className="text-center py-4">
+        <p className="text-nbTextLight">No suggested articles at this time</p>
+      </div>
+    );
+  }
+
+  return (
+    <Carousel className="w-full pb-8">
+      <CarouselContent className="-ml-6 md:-ml-8">
+        {suggestedArticles.map((article: Article) => (
+          <CarouselItem
+            key={article.id}
+            className="
+              pl-6 md:pl-8
+              basis-full
+              sm:basis-2/3
+              md:basis-1/2
+              lg:basis-1/3
+              xl:basis-1/4
+            "
+          >
+            <div className="p-6">
+              <ArticleCard
+                article={article}
+                onDelete={handleDeleteArticle}
+                suggested={true}
+                onAccept={handleAcceptSuggestion}
+                onReject={handleRejectSuggestion}
+              />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious className="-left-4 bg-white hover:bg-nbBackground" />
+      <CarouselNext className="-right-4 bg-white hover:bg-nbBackground" />
+    </Carousel>
+  );
+};
+
   
   return (
     <div className="nb-container pt-6">
