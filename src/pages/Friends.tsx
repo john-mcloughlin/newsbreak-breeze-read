@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -117,8 +116,8 @@ const Friends = () => {
   };
 
   const renderFriendItem = (friend: Friend, showActions = true) => (
-    <div key={friend.id} className="flex items-center justify-between py-3 px-4 rounded-md hover:bg-accent/10 transition-colors">
-      <div className="flex items-center gap-3">
+    <div key={friend.id} className="flex flex-col sm:flex-row sm:items-center justify-between py-3 px-4 rounded-md hover:bg-accent/10 transition-colors">
+      <div className="flex items-center gap-3 mb-2 sm:mb-0">
         <Avatar>
           <AvatarImage src={friend.avatarUrl} />
           <AvatarFallback>{getInitials(friend.username)}</AvatarFallback>
@@ -135,7 +134,7 @@ const Friends = () => {
       </div>
       
       {showActions && (
-        <div>
+        <div className="ml-12 sm:ml-0">
           {friend.status === "friend" && (
             <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "remove")}>
               {isMobile ? <X size={16} /> : "Remove"}
@@ -144,28 +143,19 @@ const Friends = () => {
           {friend.status === "pending" && (
             <div className="flex gap-2">
               <Button variant="default" size="sm" onClick={() => handleFriendAction(friend.id, "accept")}>
-                {isMobile ? <Check size={16} /> : <><Check size={14} className="mr-1" /> Accept</>}
+                <Check size={16} />
+                {!isMobile && <span className="ml-1">Accept</span>}
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "reject")}>
-                {isMobile ? <X size={16} /> : <><X size={14} className="mr-1" /> Reject</>}
+                <X size={16} />
+                {!isMobile && <span className="ml-1">Reject</span>}
               </Button>
             </div>
           )}
           {friend.status === "requested" && (
-            <div>
-              {isMobile ? (
-                <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "unsend")}>
-                  <Undo size={16} />
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-muted-foreground">Request Sent</Badge>
-                  <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "unsend")}>
-                    Unsend
-                  </Button>
-                </div>
-              )}
-            </div>
+            <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "unsend")}>
+              {isMobile ? <Undo size={16} /> : "Unsend"}
+            </Button>
           )}
           {!friend.status && (
             <Button variant="outline" size="sm" onClick={() => handleFriendAction(friend.id, "add")}>
