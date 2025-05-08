@@ -129,7 +129,7 @@ const Home = () => {
   }
 
   return (
-    <Carousel className="w-full pb-8">
+    <Carousel className="w-full pb-8 px-8">
       <CarouselContent className="-ml-6 md:-ml-8">
         {articles.map((article: Article) => (
           <CarouselItem
