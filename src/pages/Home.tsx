@@ -95,80 +95,54 @@ const Home = () => {
   };
   
 const renderArticlesList = () => {
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-10">
-        <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-nbBlue-200 border-t-nbBlue-600 mx-auto"></div>
-          <p className="text-nbTextLight">Loading your articles...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="py-6 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
-        <Button onClick={fetchArticles} variant="outline">
-          Try again
-        </Button>
-      </div>
-    );
-  }
-
-  if (articles.length === 0) {
-    return (
-      <div className="py-10 text-center">
-        <BookOpen size={48} className="mx-auto mb-4 text-nbTextLight opacity-50" />
-        <h3 className="text-xl font-medium mb-2">Your library is empty</h3>
-        <p className="text-nbTextLight mb-6 max-w-md mx-auto">
-          Save articles using the browser extension to build your library.
-        </p>
-      </div>
-    );
-  }
+  if (loading)   { /* … */ }
+  if (error)     { /* … */ }
+  if (articles.length === 0) { /* … */ }
 
   return (
-    <div className="relative px-4 md:px-12">
-      <Carousel className="w-full pb-8">
-        <CarouselContent
-          className="
-            -ml-4 md:-ml-6
-            flex-nowrap
-            snap-x snap-mandatory
-          "
-        >
-          {articles.map((article: Article) => (
-            <CarouselItem
-              key={article.id}
-              className="
-                pl-4 md:pl-6
-                snap-start flex-shrink-0
-                w-full sm:w-[calc(100%/2-16px)] md:w-[calc(100%/2-24px)] lg:w-[calc(100%/3-24px)] xl:w-[calc(100%/4-24px)]
-                min-w-[280px]
-              "
-            >
-              <div className="p-2">
-                <ArticleCard
-                  article={article}
-                  onDelete={handleDeleteArticle}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+    <Carousel className="w-full pb-8">
+      <CarouselContent
+        className="
+          flex-nowrap overflow-x-auto scroll-smooth
+          snap-x snap-mandatory
+          -mx-4 md:-mx-6
+        "
+      >
+        {articles.map((article: Article) => (
+          <CarouselItem
+            key={article.id}
+            className="
+              snap-start flex-shrink-0
+              px-4 md:px-6
+              basis-full
+              sm:basis-1/2
+              md:basis-1/3
+              lg:basis-1/4
+              xl:basis-1/5
+            "
+          >
+            <div className="p-2">
+              <ArticleCard
+                article={article}
+                onDelete={handleDeleteArticle}
+              />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
 
-        <div className="block mt-4 md:hidden">
-          <p className="text-xs text-center text-nbTextLight">Swipe to see more articles</p>
-        </div>
-
-        <div className="hidden md:block">
-          <CarouselPrevious className="z-10 -left-6 lg:-left-12" />
-          <CarouselNext className="z-10 -right-6 lg:-right-12" />
-        </div>
-      </Carousel>
-    </div>
+      {/* arrows for non-touch */}
+      <div className="hidden md:block">
+        <CarouselPrevious className="z-10 -left-6 lg:-left-12" />
+        <CarouselNext     className="z-10 -right-6 lg:-right-12" />
+      </div>
+      {/* swipe hint for mobile */}
+      <div className="block mt-4 md:hidden">
+        <p className="text-xs text-center text-nbTextLight">
+          Swipe to see more articles
+        </p>
+      </div>
+    </Carousel>
   );
 };
 
