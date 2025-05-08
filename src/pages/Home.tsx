@@ -138,9 +138,9 @@ const Home = () => {
               pl-6 md:pl-8
               basis-full       /* 1 per row on very small screens */
               sm:basis-2/3     /* ~2 per row on small screens */
-              md:basis-1/2     /* 2 per row on md+ */
-              lg:basis-1/3     /* 3 per row on lg+ */
-              xl:basis-1/4     /* 4 per row on xl+ */
+              md:basis-1/3     /* 2 per row on md+ */
+              lg:basis-1/4     /* 3 per row on lg+ */
+              xl:basis-1/6     /* 4 per row on xl+ */
             "
           >
             <div className="p-0">
