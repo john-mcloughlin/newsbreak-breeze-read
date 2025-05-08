@@ -143,7 +143,7 @@ const renderArticlesList = () => {
             className="
               pl-6 md:pl-8
               snap-start flex-shrink-0
-              basis-full sm:basis-2/3 md:basis-1/2 lg:basis-1/3 xl:basis-1/3
+              basis-full sm:basis-2/3 md:basis-1/2 lg:basis-1/3 xl:basis-1/4
             "
           >
             <div className="p-4">
